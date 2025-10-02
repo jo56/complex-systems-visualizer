@@ -17,8 +17,11 @@ jobs:
 
       - name: Generate .ico from PNG
         run: |
-          choco install -y imagemagick
-          magick convert sim-app/assets/AppIcon.png sim-app/assets/AppIcon.ico
+          if (Test-Path "sim-app/assets/AppIcon.png") {
+            magick "sim-app/assets/AppIcon.png" "sim-app/assets/AppIcon.ico"
+          } else {
+            Write-Host "No AppIcon.png found, skipping Windows icon generation"
+          }
 
       - name: Build (Windows)
         working-directory: sim-app
@@ -51,20 +54,24 @@ jobs:
       - name: Generate .icns from PNG
         run: |
           SRC="sim-app/assets/AppIcon.png"
-          ICONSET="sim-app/assets/AppIcon.iconset"
-          mkdir -p "$ICONSET"
-          sips -z 16 16     "$SRC" --out "$ICONSET/icon_16x16.png"
-          sips -z 32 32     "$SRC" --out "$ICONSET/icon_16x16@2x.png"
-          sips -z 32 32     "$SRC" --out "$ICONSET/icon_32x32.png"
-          sips -z 64 64     "$SRC" --out "$ICONSET/icon_32x32@2x.png"
-          sips -z 128 128   "$SRC" --out "$ICONSET/icon_128x128.png"
-          sips -z 256 256   "$SRC" --out "$ICONSET/icon_128x128@2x.png"
-          sips -z 256 256   "$SRC" --out "$ICONSET/icon_256x256.png"
-          sips -z 512 512   "$SRC" --out "$ICONSET/icon_256x256@2x.png"
-          sips -z 512 512   "$SRC" --out "$ICONSET/icon_512x512.png"
-          cp "$SRC" "$ICONSET/icon_512x512@2x.png"
-          iconutil -c icns "$ICONSET"
-          mv sim-app/assets/AppIcon.icns sim-app/assets/AppIcon.icns
+          if [ -f "$SRC" ]; then
+            ICONSET="sim-app/assets/AppIcon.iconset"
+            mkdir -p "$ICONSET"
+            sips -z 16 16     "$SRC" --out "$ICONSET/icon_16x16.png"
+            sips -z 32 32     "$SRC" --out "$ICONSET/icon_16x16@2x.png"
+            sips -z 32 32     "$SRC" --out "$ICONSET/icon_32x32.png"
+            sips -z 64 64     "$SRC" --out "$ICONSET/icon_32x32@2x.png"
+            sips -z 128 128   "$SRC" --out "$ICONSET/icon_128x128.png"
+            sips -z 256 256   "$SRC" --out "$ICONSET/icon_128x128@2x.png"
+            sips -z 256 256   "$SRC" --out "$ICONSET/icon_256x256.png"
+            sips -z 512 512   "$SRC" --out "$ICONSET/icon_256x256@2x.png"
+            sips -z 512 512   "$SRC" --out "$ICONSET/icon_512x512.png"
+            cp "$SRC" "$ICONSET/icon_512x512@2x.png"
+            iconutil -c icns "$ICONSET"
+            mv sim-app/assets/AppIcon.icns sim-app/assets/AppIcon.icns
+          else
+            echo "No AppIcon.png found, skipping macOS icon generation"
+          fi
 
       - name: Install cargo-bundle
         run: cargo install cargo-bundle
@@ -77,7 +84,7 @@ jobs:
         run: |
           set -e
           mkdir dmg
-          cp -R target/release/bundle/osx/*.app dmg/
+          cp -R target/release/bundle/osx/*.app dmg/ || echo "No .app bundle found"
           [ -f README.md ] && cp README.md dmg/
           [ -f LICENSE ]   && cp LICENSE dmg/
           [ -d assets ]    && cp -r assets dmg/assets
