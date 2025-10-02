@@ -18,21 +18,21 @@ jobs:
           override: true
 
       - name: Build release binary
-        run: cargo build --release --bin mandlebrot-viz
+        run: cargo build --release --bin mandlebrot-visualizer
 
       - name: Package Windows zip
         run: |
           mkdir dist
-          copy target\release\mandlebrot-viz.exe dist\
+          copy target\release\mandlebrot-visualizer.exe dist\
           copy README.md dist\
           copy LICENSE dist\
           if (Test-Path assets) { Copy-Item assets dist\assets -Recurse }
-          powershell Compress-Archive dist mandlebrot-viz-windows-x64.zip
+          powershell Compress-Archive dist mandlebrot-visualizer-windows-x64.zip
 
       - name: Upload release asset (Windows)
         uses: softprops/action-gh-release@v1
         with:
-          files: mandlebrot-viz-windows-x64.zip
+          files: mandlebrot-visualizer-windows-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -51,18 +51,18 @@ jobs:
         run: cargo install cargo-bundle
 
       - name: Build macOS app bundle
-        run: cargo bundle --release --bin mandlebrot-viz
+        run: cargo bundle --release --bin mandlebrot-visualizer
 
       - name: Create DMG
         run: |
           mkdir dmg
           cp -R target/release/bundle/osx/*.app dmg/
-          hdiutil create -volname "ComplexViz" -srcfolder dmg -ov -format UDZO mandlebrot-viz-macos.dmg
+          hdiutil create -volname "ComplexViz" -srcfolder dmg -ov -format UDZO mandlebrot-visualizer-macos.dmg
 
       - name: Upload release asset (macOS)
         uses: softprops/action-gh-release@v1
         with:
-          files: mandlebrot-viz-macos.dmg
+          files: mandlebrot-visualizer-macos.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,20 +78,20 @@ jobs:
           override: true
 
       - name: Build release binary
-        run: cargo build --release --bin mandlebrot-viz
+        run: cargo build --release --bin mandlebrot-visualizer
 
       - name: Package Linux tar.gz
         run: |
           mkdir dist
-          cp target/release/mandlebrot-viz dist/
+          cp target/release/mandlebrot-visualizer dist/
           cp README.md dist/
           cp LICENSE dist/
           if [ -d assets ]; then cp -r assets dist/; fi
-          tar -czvf mandlebrot-viz-linux-x64.tar.gz -C dist .
+          tar -czvf mandlebrot-visualizer-linux-x64.tar.gz -C dist .
 
       - name: Upload release asset (Linux)
         uses: softprops/action-gh-release@v1
         with:
-          files: mandlebrot-viz-linux-x64.tar.gz
+          files: mandlebrot-visualizer-linux-x64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
