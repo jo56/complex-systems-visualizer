@@ -37,11 +37,22 @@ struct ComplexSystemsApp {
 impl ComplexSystemsApp {
     fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         let simulations_2d: Vec<Simulation2DBox> = vec![
+            // Fractals
             Box::new(mandelbrot::Mandelbrot::new()),
             Box::new(julia::Julia::new()),
             Box::new(burning_ship::BurningShip::new()),
+
+            // Cellular Systems
             Box::new(game_of_life::GameOfLife::new()),
             Box::new(cellular_automaton::CellularAutomaton::new(30)),
+
+            // Generative Patterns
+            Box::new(generative::KochSnowflake::new()),
+            Box::new(generative::Phyllotaxis::new()),
+            Box::new(generative::PerlinFlow::new()),
+            Box::new(generative::Boids::new()),
+            Box::new(generative::DeJongAttractor::new()),
+            Box::new(generative::CliffordAttractor::new()),
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
@@ -66,8 +77,8 @@ impl eframe::App for ComplexSystemsApp {
         ctx.request_repaint();
 
         egui::SidePanel::left("control_panel")
-            .min_width(320.0)
-            .max_width(400.0)
+            .min_width(400.0)
+            .max_width(550.0)
             .resizable(true)
             .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {

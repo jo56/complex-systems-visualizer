@@ -9,3 +9,6 @@ license.workspace = true
 rayon.workspace = true
 num-complex.workspace = true
 egui = "0.29"
+noise.workspace = true
+rand.workspace = true
+palette.workspace = true

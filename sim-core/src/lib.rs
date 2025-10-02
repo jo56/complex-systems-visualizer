@@ -6,6 +6,9 @@ pub mod cellular_automaton;
 pub mod burning_ship;
 pub mod rossler;
 
+// Generative patterns module
+pub mod generative;
+
 /// Color representation in RGB format
 #[derive(Debug, Clone, Copy)]
 pub struct Color {
@@ -59,6 +62,31 @@ impl Color {
             b: (a.b as f32 * (1.0 - t) + b.b as f32 * t) as u8,
         }
     }
+
+    pub fn rgb_to_hsv_static(color: Color) -> (f32, f32, f32) {
+        let r = color.r as f32 / 255.0;
+        let g = color.g as f32 / 255.0;
+        let b = color.b as f32 / 255.0;
+
+        let max = r.max(g).max(b);
+        let min = r.min(g).min(b);
+        let delta = max - min;
+
+        let h = if delta == 0.0 {
+            0.0
+        } else if max == r {
+            60.0 * (((g - b) / delta) % 6.0)
+        } else if max == g {
+            60.0 * (((b - r) / delta) + 2.0)
+        } else {
+            60.0 * (((r - g) / delta) + 4.0)
+        };
+
+        let s = if max == 0.0 { 0.0 } else { delta / max };
+        let v = max;
+
+        (h, s, v)
+    }
 }
 
 /// Color schemes for fractal visualization
@@ -72,6 +100,25 @@ pub enum ColorScheme {
     Ultra,
     Sunset,
     Ocean,
+    // New palettes
+    Plasma,
+    Viridis,
+    Inferno,
+    Magma,
+    Cividis,
+    Turbo,
+    CoolWarm,
+    Spectral,
+    Purple,
+    Green,
+    Blues,
+    YellowOrangeBrown,
+    PinkYellow,
+    Neon,
+    Pastel,
+    Earth,
+    Copper,
+    Galaxy,
 }
 
 impl ColorScheme {
@@ -85,6 +132,24 @@ impl ColorScheme {
             ColorScheme::Ultra,
             ColorScheme::Sunset,
             ColorScheme::Ocean,
+            ColorScheme::Plasma,
+            ColorScheme::Viridis,
+            ColorScheme::Inferno,
+            ColorScheme::Magma,
+            ColorScheme::Cividis,
+            ColorScheme::Turbo,
+            ColorScheme::CoolWarm,
+            ColorScheme::Spectral,
+            ColorScheme::Purple,
+            ColorScheme::Green,
+            ColorScheme::Blues,
+            ColorScheme::YellowOrangeBrown,
+            ColorScheme::PinkYellow,
+            ColorScheme::Neon,
+            ColorScheme::Pastel,
+            ColorScheme::Earth,
+            ColorScheme::Copper,
+            ColorScheme::Galaxy,
         ]
     }
 
@@ -98,6 +163,24 @@ impl ColorScheme {
             ColorScheme::Ultra => "Ultra",
             ColorScheme::Sunset => "Sunset",
             ColorScheme::Ocean => "Ocean",
+            ColorScheme::Plasma => "Plasma",
+            ColorScheme::Viridis => "Viridis",
+            ColorScheme::Inferno => "Inferno",
+            ColorScheme::Magma => "Magma",
+            ColorScheme::Cividis => "Cividis",
+            ColorScheme::Turbo => "Turbo",
+            ColorScheme::CoolWarm => "Cool-Warm",
+            ColorScheme::Spectral => "Spectral",
+            ColorScheme::Purple => "Purple",
+            ColorScheme::Green => "Green",
+            ColorScheme::Blues => "Blues",
+            ColorScheme::YellowOrangeBrown => "Yellow-Orange-Brown",
+            ColorScheme::PinkYellow => "Pink-Yellow",
+            ColorScheme::Neon => "Neon",
+            ColorScheme::Pastel => "Pastel",
+            ColorScheme::Earth => "Earth",
+            ColorScheme::Copper => "Copper",
+            ColorScheme::Galaxy => "Galaxy",
         }
     }
 
@@ -155,6 +238,116 @@ impl ColorScheme {
                     Color::lerp(Color::from_rgb(0, 20, 40), Color::from_rgb(0, 105, 148), t * 2.0)
                 } else {
                     Color::lerp(Color::from_rgb(0, 105, 148), Color::from_rgb(72, 209, 204), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::Plasma => {
+                // Plasma: Purple → Pink → Orange → Yellow
+                if t < 0.33 {
+                    Color::lerp(Color::from_rgb(13, 8, 135), Color::from_rgb(183, 55, 121), t * 3.0)
+                } else if t < 0.66 {
+                    Color::lerp(Color::from_rgb(183, 55, 121), Color::from_rgb(252, 136, 68), (t - 0.33) * 3.0)
+                } else {
+                    Color::lerp(Color::from_rgb(252, 136, 68), Color::from_rgb(240, 249, 33), (t - 0.66) * 3.0)
+                }
+            }
+            ColorScheme::Viridis => {
+                // Viridis: Dark Blue → Teal → Yellow-Green
+                if t < 0.5 {
+                    Color::lerp(Color::from_rgb(68, 1, 84), Color::from_rgb(59, 82, 139), t * 2.0)
+                } else {
+                    Color::lerp(Color::from_rgb(59, 82, 139), Color::from_rgb(253, 231, 37), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::Inferno => {
+                // Inferno: Black → Purple → Red → Yellow
+                if t < 0.33 {
+                    Color::lerp(Color::from_rgb(0, 0, 4), Color::from_rgb(106, 23, 110), t * 3.0)
+                } else if t < 0.66 {
+                    Color::lerp(Color::from_rgb(106, 23, 110), Color::from_rgb(237, 93, 36), (t - 0.33) * 3.0)
+                } else {
+                    Color::lerp(Color::from_rgb(237, 93, 36), Color::from_rgb(252, 255, 164), (t - 0.66) * 3.0)
+                }
+            }
+            ColorScheme::Magma => {
+                // Magma: Black → Purple → Pink → White
+                if t < 0.5 {
+                    Color::lerp(Color::from_rgb(0, 0, 4), Color::from_rgb(124, 48, 147), t * 2.0)
+                } else {
+                    Color::lerp(Color::from_rgb(124, 48, 147), Color::from_rgb(252, 253, 191), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::Cividis => {
+                // Cividis: Blue → Yellow (colorblind-friendly)
+                Color::lerp(Color::from_rgb(0, 32, 77), Color::from_rgb(253, 231, 97), t)
+            }
+            ColorScheme::Turbo => {
+                // Turbo: Rainbow-like but more perceptually uniform
+                Color::from_hsv(t * 300.0, 0.9, 0.95)
+            }
+            ColorScheme::CoolWarm => {
+                // Cool-Warm: Blue → White → Red
+                if t < 0.5 {
+                    Color::lerp(Color::from_rgb(59, 76, 192), Color::from_rgb(221, 221, 221), t * 2.0)
+                } else {
+                    Color::lerp(Color::from_rgb(221, 221, 221), Color::from_rgb(180, 4, 38), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::Spectral => {
+                // Spectral: Red → Yellow → Green → Blue → Purple
+                Color::from_hsv((1.0 - t) * 280.0, 0.8, 0.9)
+            }
+            ColorScheme::Purple => {
+                // Purple gradient
+                Color::lerp(Color::from_rgb(30, 0, 50), Color::from_rgb(200, 100, 255), t)
+            }
+            ColorScheme::Green => {
+                // Green gradient
+                Color::lerp(Color::from_rgb(0, 50, 20), Color::from_rgb(100, 255, 150), t)
+            }
+            ColorScheme::Blues => {
+                // Blues gradient
+                Color::lerp(Color::from_rgb(8, 29, 88), Color::from_rgb(158, 202, 225), t)
+            }
+            ColorScheme::YellowOrangeBrown => {
+                // Yellow → Orange → Brown
+                if t < 0.5 {
+                    Color::lerp(Color::from_rgb(255, 255, 178), Color::from_rgb(254, 178, 76), t * 2.0)
+                } else {
+                    Color::lerp(Color::from_rgb(254, 178, 76), Color::from_rgb(127, 59, 8), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::PinkYellow => {
+                // Pink → Yellow
+                Color::lerp(Color::from_rgb(255, 105, 180), Color::from_rgb(255, 255, 100), t)
+            }
+            ColorScheme::Neon => {
+                // Bright neon colors
+                Color::from_hsv(t * 360.0, 1.0, 1.0)
+            }
+            ColorScheme::Pastel => {
+                // Soft pastel colors
+                Color::from_hsv(t * 360.0, 0.3, 0.95)
+            }
+            ColorScheme::Earth => {
+                // Earth tones: Brown → Tan → Green
+                if t < 0.5 {
+                    Color::lerp(Color::from_rgb(101, 67, 33), Color::from_rgb(194, 178, 128), t * 2.0)
+                } else {
+                    Color::lerp(Color::from_rgb(194, 178, 128), Color::from_rgb(135, 169, 107), (t - 0.5) * 2.0)
+                }
+            }
+            ColorScheme::Copper => {
+                // Copper: Black → Brown → Orange
+                Color::lerp(Color::BLACK, Color::from_rgb(255, 138, 76), t)
+            }
+            ColorScheme::Galaxy => {
+                // Galaxy: Deep space colors
+                if t < 0.33 {
+                    Color::lerp(Color::from_rgb(10, 5, 30), Color::from_rgb(70, 30, 100), t * 3.0)
+                } else if t < 0.66 {
+                    Color::lerp(Color::from_rgb(70, 30, 100), Color::from_rgb(130, 80, 200), (t - 0.33) * 3.0)
+                } else {
+                    Color::lerp(Color::from_rgb(130, 80, 200), Color::from_rgb(200, 150, 255), (t - 0.66) * 3.0)
                 }
             }
         }
