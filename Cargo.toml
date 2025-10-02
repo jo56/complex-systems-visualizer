@@ -1,0 +1,14 @@
+[workspace]
+members = ["sim-core", "sim-app"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Complex Systems Visualizer"]
+license = "MIT"
+
+[workspace.dependencies]
+rayon = "1.10"
+image = "0.25"
+num-complex = "0.4"

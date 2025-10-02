@@ -1,0 +1,18 @@
+[package]
+name = "sim-app"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "complex-viz"
+path = "src/main.rs"
+
+[dependencies]
+sim-core = { path = "../sim-core" }
+eframe = "0.29"
+egui = "0.29"
+egui_plot = "0.29"
+rayon.workspace = true
+num-complex.workspace = true
