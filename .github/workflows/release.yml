@@ -1,0 +1,97 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # triggers on version tags, e.g. v1.0.0
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build release binary
+        run: cargo build --release --bin mandlebrot-viz
+
+      - name: Package Windows zip
+        run: |
+          mkdir dist
+          copy target\release\mandlebrot-viz.exe dist\
+          copy README.md dist\
+          copy LICENSE dist\
+          if (Test-Path assets) { Copy-Item assets dist\assets -Recurse }
+          powershell Compress-Archive dist mandlebrot-viz-windows-x64.zip
+
+      - name: Upload release asset (Windows)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mandlebrot-viz-windows-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install cargo-bundle
+        run: cargo install cargo-bundle
+
+      - name: Build macOS app bundle
+        run: cargo bundle --release --bin mandlebrot-viz
+
+      - name: Create DMG
+        run: |
+          mkdir dmg
+          cp -R target/release/bundle/osx/*.app dmg/
+          hdiutil create -volname "ComplexViz" -srcfolder dmg -ov -format UDZO mandlebrot-viz-macos.dmg
+
+      - name: Upload release asset (macOS)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mandlebrot-viz-macos.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build release binary
+        run: cargo build --release --bin mandlebrot-viz
+
+      - name: Package Linux tar.gz
+        run: |
+          mkdir dist
+          cp target/release/mandlebrot-viz dist/
+          cp README.md dist/
+          cp LICENSE dist/
+          if [ -d assets ]; then cp -r assets dist/; fi
+          tar -czvf mandlebrot-viz-linux-x64.tar.gz -C dist .
+
+      - name: Upload release asset (Linux)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mandlebrot-viz-linux-x64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
