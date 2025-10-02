@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+description = "An interactive Mandelbrot-style visualizer built with egui"
 
 [[bin]]
 name = "mandlebrot-viz"
@@ -16,3 +17,19 @@ egui = "0.29"
 egui_plot = "0.29"
 rayon.workspace = true
 num-complex.workspace = true
+
+# --- macOS bundle metadata for cargo-bundle ---
+[package.metadata.bundle]
+name = "Mandlebrot Viz"
+identifier = "com.yourname.mandlebrotviz"
+version = "0.1.0"
+short_description = "Explore Mandelbrot and fractal-style visualizations"
+long_description = """
+Mandlebrot Viz is a desktop application for exploring Mandelbrot-style
+fractals and interactive visualizations built with egui.
+"""
+# workflow will generate this .icns file from AppIcon.png at build time
+icon = ["assets/AppIcon.icns"]
+
+[build-dependencies]
+winres = "0.1"
