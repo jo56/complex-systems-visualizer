@@ -10,7 +10,7 @@ A fullstack Rust application for exploring complex systems, fractals, and emerge
 The project uses a Cargo workspace structure for modularity:
 
 ```
-mandlebrot-visualizer/
+mandelbrot-visualizer/
 ├── sim-core/          # Core simulation library
 │   ├── src/
 │   │   ├── lib.rs              # Simulation traits + color system
@@ -45,19 +45,19 @@ mandlebrot-visualizer/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd mandlebrot-visualizer
+cd mandelbrot-visualizer
 
 # Build the project
 cargo build --release
 
 # Run the application
-cargo run --release --bin mandlebrot-viz
+cargo run --release --bin mandelbrot-viz
 ```
 
 ### Development Build
 
 ```bash
-cargo run --bin mandlebrot-viz
+cargo run --bin mandelbrot-viz
 ```
 
 ## Usage

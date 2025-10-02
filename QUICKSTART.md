@@ -4,10 +4,10 @@
 
 ```bash
 # Build and run in release mode (recommended for best performance)
-cargo run --release --bin mandlebrot-viz
+cargo run --release --bin mandelbrot-viz
 
 # Or for development (faster compile, slower runtime)
-cargo run --bin mandlebrot-viz
+cargo run --bin mandelbrot-viz
 ```
 
 ## What You'll See
