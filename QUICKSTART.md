@@ -4,10 +4,10 @@
 
 ```bash
 # Build and run in release mode (recommended for best performance)
-cargo run --release --bin complex-viz
+cargo run --release --bin mandlebrot-viz
 
 # Or for development (faster compile, slower runtime)
-cargo run --bin complex-viz
+cargo run --bin mandlebrot-viz
 ```
 
 ## What You'll See

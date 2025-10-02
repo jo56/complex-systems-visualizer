@@ -118,13 +118,13 @@ cd mandlebrot-visualizer
 cargo build --release
 
 # Run the application
-cargo run --release --bin complex-viz
+cargo run --release --bin mandlebrot-viz
 ```
 
 ### Development Build
 
 ```bash
-cargo run --bin complex-viz
+cargo run --bin mandlebrot-viz
 ```
 
 ## Usage
