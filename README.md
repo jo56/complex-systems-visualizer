@@ -5,39 +5,72 @@ A fullstack Rust application for exploring complex systems, fractals, and emerge
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## Features
+## ✨ Features
 
-### 2D Simulations
+### 🎨 Universal Color System
 
-- **Mandelbrot Set** - Explore the famous fractal with infinite detail
-  - Adjustable iteration count and zoom
-  - Interactive parameter controls
-  - Colorization options
-  - Quick navigation to interesting locations (Seahorse Valley, Elephant Valley, Spirals)
+All fractals support **8 stunning color schemes**:
+- Classic, Rainbow, Fire, Ice, Grayscale, Ultra, Sunset, Ocean
+- **Smooth coloring** for continuous gradients
+- **Color offset** and **cycling** for dynamic animations
+- **Invert colors** option
 
-- **Julia Set** - Related fractals with beautiful variations
-  - Adjustable complex parameter (c)
-  - Multiple preset configurations (Dendrite, San Marco Dragon, Siegel Disk, Douady's Rabbit)
-  - Real-time parameter tweaking
+### 🌀 Fractal Simulations (2D)
 
-- **Conway's Game of Life** - Cellular automaton showing emergent complexity
-  - Pre-loaded with Gosper's Glider Gun pattern
-  - Adjustable simulation speed
-  - Step-by-step or continuous mode
-  - Random initialization
+#### **Mandelbrot Set** - Classic fractal explorer
+- **Power parameter** (z^2 to z^8) - Explore Multibrot sets
+- **8 color schemes** with smooth coloring
+- **Color cycling animation**
+- **Extended zoom** up to 10,000×
+- **5 preset locations** (Seahorse Valley, Elephant Valley, Spirals, Mini Mandelbrot)
+- Adjustable escape radius and iterations (up to 1000)
 
-- **Elementary Cellular Automaton** - Wolfram's 1D cellular automata
-  - All 256 rules supported
-  - Famous patterns: Rule 30 (chaotic), Rule 110 (Turing complete), Rule 90 (Sierpinski triangle)
-  - Visual evolution from simple rules to complex patterns
+#### **Julia Set** - Morphing fractals
+- **Animation mode** - Watch c parameter orbit in real-time
+- **Power parameter** - Multijulia sets
+- **8 color schemes** with all effects
+- **5 classic presets** (Dendrite, San Marco Dragon, Siegel Disk, Douady's Rabbit, Galaxy)
+- Smooth coloring with adjustable parameters
 
-### 3D Simulations
+#### **Burning Ship** - Unique fractal (NEW!)
+- Uses absolute values for unique ship-like structure
+- Full color scheme support
+- 3 detailed zoom locations
+- Smooth iteration coloring
 
-- **Lorenz Attractor** - Chaotic system demonstrating the butterfly effect
-  - Real-time 3D trajectory visualization
-  - Adjustable parameters (σ, ρ, β)
-  - Interactive rotation and zoom
-  - Trail rendering to show system evolution
+#### **Conway's Game of Life** - Emergent complexity
+- **6 rule variations**:
+  - Conway (B3/S23) - Classic
+  - HighLife (B36/S23) - Creates replicators
+  - Seeds (B2/S) - Two-neighbor birth
+  - Life Without Death - Immortal cells
+  - Day & Night (B3678/S34678) - Symmetric
+  - Maze (B3/S12345) - Maze generator
+- **7 pattern library**: Glider Gun, Glider, Pulsar, Pentadecathlon, LWSS, Acorn, Random Soup
+- **Color by age** visualization
+- Generation counter and live cell statistics
+- Pause/play controls
+
+#### **Elementary Cellular Automaton** - Wolfram's 1D CA
+- All 256 rules (including 30, 110, 90, 184)
+- Color-coded by rule
+- Multiple initial conditions
+- Auto-stepping with speed control
+
+### 🎲 3D Chaotic Systems
+
+#### **Lorenz Attractor** - The butterfly effect
+- Classic chaotic system (σ, ρ, β parameters)
+- Interactive 3D rotation
+- Trail length control (up to 10,000 points)
+- RK4 numerical integration
+- 2 preset configurations
+
+#### **Rössler Attractor** - Continuous chaos (NEW!)
+- Adjustable system parameters (a, b, c)
+- 3 interesting configurations
+- Smooth trajectory rendering
+- Speed and trail controls
 
 ## Architecture
 
@@ -47,12 +80,14 @@ The project uses a Cargo workspace structure for modularity:
 mandlebrot-visualizer/
 ├── sim-core/          # Core simulation library
 │   ├── src/
-│   │   ├── lib.rs              # Simulation traits
-│   │   ├── mandelbrot.rs       # Mandelbrot implementation
-│   │   ├── julia.rs            # Julia set implementation
-│   │   ├── game_of_life.rs     # Game of Life implementation
-│   │   ├── cellular_automaton.rs # Elementary CA implementation
-│   │   └── lorenz.rs           # Lorenz attractor implementation
+│   │   ├── lib.rs              # Simulation traits + color system
+│   │   ├── mandelbrot.rs       # Mandelbrot (enhanced)
+│   │   ├── julia.rs            # Julia set (enhanced)
+│   │   ├── burning_ship.rs     # Burning Ship fractal (NEW)
+│   │   ├── game_of_life.rs     # Game of Life (6 rules, 7 patterns)
+│   │   ├── cellular_automaton.rs # Elementary CA
+│   │   ├── lorenz.rs           # Lorenz attractor
+│   │   └── rossler.rs          # Rössler attractor (NEW)
 │   └── Cargo.toml
 │
 ├── sim-app/           # GUI application
@@ -115,7 +150,18 @@ cargo run --bin complex-viz
 - Reset button to return to default view
 - System parameters adjust the underlying physics
 
-## Technology Stack
+## 🎯 Key Highlights
+
+- **7 Total Simulations** (5 × 2D, 2 × 3D)
+- **8 Color Schemes** for all fractals
+- **6 Game of Life Rules** with 7 pattern presets
+- **Smooth Coloring** - Continuous iteration escape algorithms
+- **Power Parameters** - Generalized Mandelbrot/Julia sets (z^n)
+- **Animation Support** - Julia set morphing, color cycling
+- **Organized UI** - Collapsible sections with emoji icons
+- **Resizable Panel** - 320-400px adjustable control sidebar
+
+## 💻 Technology Stack
 
 - **[Rust](https://www.rust-lang.org/)** - Systems programming language
 - **[egui](https://github.com/emilk/egui)** - Immediate mode GUI library
@@ -131,16 +177,48 @@ All 2D simulations use parallel computation via `rayon` for fast rendering. The 
 - Real-time parameter updates
 - Smooth 60 FPS animations for cellular automata and 3D systems
 
-## Future Enhancements
+## 📚 Documentation
 
-Potential additions for the project:
-- More 3D attractors (Rössler, Aizawa, etc.)
-- Langton's Ant and other 2D automata
+- **[FEATURES.md](FEATURES.md)** - Comprehensive feature guide with all settings explained
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for new users
+
+## 🎨 What's New in v0.2.0
+
+### Color & Rendering
+- ✨ 8 beautiful color schemes (Classic, Rainbow, Fire, Ice, Grayscale, Ultra, Sunset, Ocean)
+- ✨ Smooth (continuous) coloring for all fractals
+- ✨ Color offset and cycling animations
+- ✨ Color inversion option
+
+### Fractals Enhanced
+- 🌀 Mandelbrot: Power parameter (z^2 to z^8), color cycling, 2 new locations
+- 🌊 Julia: Animation mode, power parameter, new Galaxy preset
+- 🔥 Burning Ship: NEW fractal simulation added
+
+### Game of Life Expanded
+- 🧬 6 rule variations (Conway, HighLife, Seeds, Life Without Death, Day & Night, Maze)
+- 📚 7 pattern library (Glider Gun, Pulsar, Pentadecathlon, LWSS, Acorn, etc.)
+- 🎨 Color by age visualization
+- 📊 Generation counter and population stats
+
+### 3D Systems
+- 🎲 Rössler Attractor: NEW chaotic system added
+- 🦋 Lorenz: Enhanced with organized collapsible UI
+
+### UI/UX
+- 🎭 Collapsible setting sections with emoji icons
+- 📏 Resizable control panel (320-400px)
+- 📜 Scrollable settings for long parameter lists
+
+## 🚀 Future Enhancements
+
+Potential additions:
+- Aizawa and Chen attractors
 - Reaction-diffusion systems (Gray-Scott model)
-- L-systems for fractal generation
-- Export functionality (save images/videos)
-- Custom coloring schemes
+- Langton's Ant
+- L-systems
 - Mouse interaction for fractal zooming
+- Image/video export
 
 ## Contributing
 

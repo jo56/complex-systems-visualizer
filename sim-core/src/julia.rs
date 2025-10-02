@@ -1,4 +1,4 @@
-use crate::{Color, Simulation2D};
+use crate::{Color, ColorScheme, Simulation2D};
 use num_complex::Complex64;
 use rayon::prelude::*;
 
@@ -7,7 +7,15 @@ pub struct Julia {
     pub c_real: f64,
     pub c_imag: f64,
     pub zoom: f64,
-    pub colorize: bool,
+    pub power: f64,
+    pub escape_radius: f64,
+    pub color_scheme: ColorScheme,
+    pub smooth_coloring: bool,
+    pub invert_colors: bool,
+    pub color_offset: f32,
+    pub animate: bool,
+    animation_time: f32,
+    animation_radius: f64,
 }
 
 impl Default for Julia {
@@ -17,7 +25,15 @@ impl Default for Julia {
             c_real: -0.7,
             c_imag: 0.27015,
             zoom: 1.0,
-            colorize: true,
+            power: 2.0,
+            escape_radius: 2.0,
+            color_scheme: ColorScheme::Ultra,
+            smooth_coloring: true,
+            invert_colors: false,
+            color_offset: 0.0,
+            animate: false,
+            animation_time: 0.0,
+            animation_radius: 0.7885,
         }
     }
 }
@@ -27,17 +43,29 @@ impl Julia {
         Self::default()
     }
 
-    fn julia_iterations(&self, z0: Complex64) -> u32 {
+    fn julia_iterations(&self, z0: Complex64) -> (u32, f64) {
         let c = Complex64::new(self.c_real, self.c_imag);
         let mut z = z0;
+        let escape_sqr = self.escape_radius * self.escape_radius;
 
         for i in 0..self.max_iterations {
-            if z.norm_sqr() > 4.0 {
-                return i;
+            let z_norm_sqr = z.norm_sqr();
+            if z_norm_sqr > escape_sqr {
+                if self.smooth_coloring {
+                    let log_zn = z_norm_sqr.ln() / 2.0;
+                    let nu = (log_zn / self.escape_radius.ln()).ln() / 2_f64.ln();
+                    return (i, i as f64 + 1.0 - nu);
+                }
+                return (i, i as f64);
             }
-            z = z * z + c;
+
+            if (self.power - 2.0).abs() < 0.001 {
+                z = z * z + c;
+            } else {
+                z = z.powf(self.power) + c;
+            }
         }
-        self.max_iterations
+        (self.max_iterations, self.max_iterations as f64)
     }
 
     fn pixel_to_complex(&self, x: usize, y: usize, width: usize, height: usize) -> Complex64 {
@@ -50,18 +78,18 @@ impl Julia {
         Complex64::new(real, imag)
     }
 
-    fn iterations_to_color(&self, iterations: u32) -> Color {
+    fn iterations_to_color(&self, iterations: u32, smooth_iter: f64) -> Color {
         if iterations == self.max_iterations {
-            Color::BLACK
-        } else if self.colorize {
-            let t = iterations as f32 / self.max_iterations as f32;
-            let hue = (t * 360.0 + 200.0) % 360.0;
-            let saturation = 0.8;
-            let value = if t < 0.5 { 0.5 + t } else { 1.5 - t };
-            Color::from_hsv(hue, saturation, value)
+            return Color::BLACK;
+        }
+
+        let t = ((smooth_iter / self.max_iterations as f64) as f32 + self.color_offset) % 1.0;
+        let color = self.color_scheme.map(t, self.smooth_coloring);
+
+        if self.invert_colors {
+            Color::from_rgb(255 - color.r, 255 - color.g, 255 - color.b)
         } else {
-            let intensity = (255.0 * (1.0 - iterations as f32 / self.max_iterations as f32)) as u8;
-            Color { r: intensity, g: intensity, b: intensity }
+            color
         }
     }
 }
@@ -78,8 +106,8 @@ impl Simulation2D for Julia {
                 (0..width)
                     .map(|x| {
                         let z = self.pixel_to_complex(x, y, width, height);
-                        let iterations = self.julia_iterations(z);
-                        self.iterations_to_color(iterations)
+                        let (iterations, smooth_iter) = self.julia_iterations(z);
+                        self.iterations_to_color(iterations, smooth_iter)
                     })
                     .collect::<Vec<_>>()
             })
@@ -89,56 +117,115 @@ impl Simulation2D for Julia {
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool {
         let mut changed = false;
 
-        ui.heading("Julia Set Parameters");
+        ui.heading("Julia Set");
 
-        changed |= ui.add(egui::Slider::new(&mut self.max_iterations, 10..=500)
-            .text("Max Iterations")).changed();
+        egui::CollapsingHeader::new("⚙ Calculation Settings")
+            .default_open(true)
+            .show(ui, |ui| {
+                changed |= ui.add(egui::Slider::new(&mut self.max_iterations, 10..=1000)
+                    .text("Max Iterations")).changed();
 
-        changed |= ui.add(egui::Slider::new(&mut self.zoom, 0.1..=100.0)
-            .logarithmic(true)
-            .text("Zoom")).changed();
+                changed |= ui.add(egui::Slider::new(&mut self.power, 2.0..=8.0)
+                    .text("Power (z^n)")).changed();
 
-        ui.horizontal(|ui| {
-            ui.label("C Real:");
-            changed |= ui.add(egui::DragValue::new(&mut self.c_real)
-                .speed(0.001)
-                .range(-2.0..=2.0)).changed();
-        });
+                changed |= ui.add(egui::Slider::new(&mut self.escape_radius, 2.0..=10.0)
+                    .text("Escape Radius")).changed();
+            });
 
-        ui.horizontal(|ui| {
-            ui.label("C Imaginary:");
-            changed |= ui.add(egui::DragValue::new(&mut self.c_imag)
-                .speed(0.001)
-                .range(-2.0..=2.0)).changed();
-        });
+        egui::CollapsingHeader::new("🌀 Julia Parameter (c)")
+            .default_open(true)
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Real:");
+                    changed |= ui.add(egui::DragValue::new(&mut self.c_real)
+                        .speed(0.001)
+                        .range(-2.0..=2.0)).changed();
+                });
 
-        changed |= ui.checkbox(&mut self.colorize, "Colorize").changed();
+                ui.horizontal(|ui| {
+                    ui.label("Imaginary:");
+                    changed |= ui.add(egui::DragValue::new(&mut self.c_imag)
+                        .speed(0.001)
+                        .range(-2.0..=2.0)).changed();
+                });
 
-        if ui.button("Reset").clicked() {
-            *self = Self::default();
-            changed = true;
-        }
+                if ui.checkbox(&mut self.animate, "Animate c parameter").changed() {
+                    changed = true;
+                }
 
-        ui.separator();
-        ui.label("Interesting parameters:");
-        if ui.button("Dendrite").clicked() {
-            self.c_real = -0.4;
-            self.c_imag = 0.6;
-            changed = true;
-        }
-        if ui.button("San Marco Dragon").clicked() {
-            self.c_real = -0.75;
-            self.c_imag = 0.0;
-            changed = true;
-        }
-        if ui.button("Siegel Disk").clicked() {
-            self.c_real = -0.391;
-            self.c_imag = -0.587;
-            changed = true;
-        }
-        if ui.button("Douady's Rabbit").clicked() {
-            self.c_real = -0.123;
-            self.c_imag = 0.745;
+                if self.animate {
+                    ui.add(egui::Slider::new(&mut self.animation_radius, 0.1..=1.0)
+                        .text("Animation Radius"));
+                }
+            });
+
+        egui::CollapsingHeader::new("🎨 Color Settings")
+            .default_open(true)
+            .show(ui, |ui| {
+                egui::ComboBox::from_label("Color Scheme")
+                    .selected_text(self.color_scheme.name())
+                    .show_ui(ui, |ui| {
+                        for scheme in ColorScheme::all() {
+                            if ui.selectable_value(&mut self.color_scheme, scheme, scheme.name()).clicked() {
+                                changed = true;
+                            }
+                        }
+                    });
+
+                changed |= ui.checkbox(&mut self.smooth_coloring, "Smooth Coloring").changed();
+                changed |= ui.checkbox(&mut self.invert_colors, "Invert Colors").changed();
+                changed |= ui.add(egui::Slider::new(&mut self.color_offset, 0.0..=1.0)
+                    .text("Color Offset")).changed();
+            });
+
+        egui::CollapsingHeader::new("🔍 Navigation")
+            .default_open(true)
+            .show(ui, |ui| {
+                changed |= ui.add(egui::Slider::new(&mut self.zoom, 0.1..=1000.0)
+                    .logarithmic(true)
+                    .text("Zoom")).changed();
+
+                if ui.button("🏠 Reset").clicked() {
+                    *self = Self::default();
+                    changed = true;
+                }
+            });
+
+        egui::CollapsingHeader::new("📍 Interesting Parameters")
+            .show(ui, |ui| {
+                if ui.button("Dendrite").clicked() {
+                    self.c_real = -0.4;
+                    self.c_imag = 0.6;
+                    changed = true;
+                }
+                if ui.button("San Marco Dragon").clicked() {
+                    self.c_real = -0.75;
+                    self.c_imag = 0.0;
+                    changed = true;
+                }
+                if ui.button("Siegel Disk").clicked() {
+                    self.c_real = -0.391;
+                    self.c_imag = -0.587;
+                    changed = true;
+                }
+                if ui.button("Douady's Rabbit").clicked() {
+                    self.c_real = -0.123;
+                    self.c_imag = 0.745;
+                    changed = true;
+                }
+                if ui.button("Galaxy").clicked() {
+                    self.c_real = 0.285;
+                    self.c_imag = 0.01;
+                    changed = true;
+                }
+            });
+
+        // Handle animation
+        if self.animate {
+            let dt = ui.input(|i| i.stable_dt);
+            self.animation_time += dt * 0.3;
+            self.c_real = self.animation_radius * self.animation_time.cos() as f64;
+            self.c_imag = self.animation_radius * self.animation_time.sin() as f64;
             changed = true;
         }
 

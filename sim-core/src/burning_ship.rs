@@ -2,46 +2,40 @@ use crate::{Color, ColorScheme, Simulation2D};
 use num_complex::Complex64;
 use rayon::prelude::*;
 
-pub struct Mandelbrot {
+pub struct BurningShip {
     pub max_iterations: u32,
     pub center_x: f64,
     pub center_y: f64,
     pub zoom: f64,
-    pub power: f64,
     pub escape_radius: f64,
     pub color_scheme: ColorScheme,
     pub smooth_coloring: bool,
     pub invert_colors: bool,
     pub color_offset: f32,
-    pub color_cycling: bool,
-    cycle_time: f32,
 }
 
-impl Default for Mandelbrot {
+impl Default for BurningShip {
     fn default() -> Self {
         Self {
             max_iterations: 100,
             center_x: -0.5,
-            center_y: 0.0,
-            zoom: 1.0,
-            power: 2.0,
+            center_y: -0.6,
+            zoom: 0.7,
             escape_radius: 2.0,
-            color_scheme: ColorScheme::Classic,
+            color_scheme: ColorScheme::Fire,
             smooth_coloring: true,
             invert_colors: false,
             color_offset: 0.0,
-            color_cycling: false,
-            cycle_time: 0.0,
         }
     }
 }
 
-impl Mandelbrot {
+impl BurningShip {
     pub fn new() -> Self {
         Self::default()
     }
 
-    fn mandelbrot_iterations(&self, c: Complex64) -> (u32, f64) {
+    fn burning_ship_iterations(&self, c: Complex64) -> (u32, f64) {
         let mut z = Complex64::new(0.0, 0.0);
         let escape_sqr = self.escape_radius * self.escape_radius;
 
@@ -49,7 +43,6 @@ impl Mandelbrot {
             let z_norm_sqr = z.norm_sqr();
             if z_norm_sqr > escape_sqr {
                 if self.smooth_coloring {
-                    // Smooth iteration count using continuous coloring
                     let log_zn = z_norm_sqr.ln() / 2.0;
                     let nu = (log_zn / self.escape_radius.ln()).ln() / 2_f64.ln();
                     return (i, i as f64 + 1.0 - nu);
@@ -57,12 +50,9 @@ impl Mandelbrot {
                 return (i, i as f64);
             }
 
-            // z = z^power + c (generalized Mandelbrot)
-            if (self.power - 2.0).abs() < 0.001 {
-                z = z * z + c;
-            } else {
-                z = z.powf(self.power) + c;
-            }
+            // Burning Ship: z = (|Re(z)| + i|Im(z)|)^2 + c
+            z = Complex64::new(z.re.abs(), z.im.abs());
+            z = z * z + c;
         }
         (self.max_iterations, self.max_iterations as f64)
     }
@@ -82,15 +72,7 @@ impl Mandelbrot {
             return Color::BLACK;
         }
 
-        let mut t = (smooth_iter / self.max_iterations as f64) as f32;
-
-        // Apply color offset/cycling
-        if self.color_cycling {
-            t = (t + self.cycle_time) % 1.0;
-        } else {
-            t = (t + self.color_offset) % 1.0;
-        }
-
+        let t = ((smooth_iter / self.max_iterations as f64) as f32 + self.color_offset) % 1.0;
         let color = self.color_scheme.map(t, self.smooth_coloring);
 
         if self.invert_colors {
@@ -101,9 +83,9 @@ impl Mandelbrot {
     }
 }
 
-impl Simulation2D for Mandelbrot {
+impl Simulation2D for BurningShip {
     fn name(&self) -> &str {
-        "Mandelbrot Set"
+        "Burning Ship Fractal"
     }
 
     fn compute(&self, width: usize, height: usize) -> Vec<Color> {
@@ -113,7 +95,7 @@ impl Simulation2D for Mandelbrot {
                 (0..width)
                     .map(|x| {
                         let c = self.pixel_to_complex(x, y, width, height);
-                        let (iterations, smooth_iter) = self.mandelbrot_iterations(c);
+                        let (iterations, smooth_iter) = self.burning_ship_iterations(c);
                         self.iterations_to_color(iterations, smooth_iter)
                     })
                     .collect::<Vec<_>>()
@@ -124,16 +106,13 @@ impl Simulation2D for Mandelbrot {
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool {
         let mut changed = false;
 
-        ui.heading("Mandelbrot Set");
+        ui.heading("Burning Ship Fractal");
 
         egui::CollapsingHeader::new("⚙ Calculation Settings")
             .default_open(true)
             .show(ui, |ui| {
                 changed |= ui.add(egui::Slider::new(&mut self.max_iterations, 10..=1000)
                     .text("Max Iterations")).changed();
-
-                changed |= ui.add(egui::Slider::new(&mut self.power, 2.0..=8.0)
-                    .text("Power (z^n)")).changed();
 
                 changed |= ui.add(egui::Slider::new(&mut self.escape_radius, 2.0..=10.0)
                     .text("Escape Radius")).changed();
@@ -154,15 +133,8 @@ impl Simulation2D for Mandelbrot {
 
                 changed |= ui.checkbox(&mut self.smooth_coloring, "Smooth Coloring").changed();
                 changed |= ui.checkbox(&mut self.invert_colors, "Invert Colors").changed();
-
-                if ui.add(egui::Slider::new(&mut self.color_offset, 0.0..=1.0)
-                    .text("Color Offset")).changed() {
-                    changed = true;
-                }
-
-                if ui.checkbox(&mut self.color_cycling, "Animate Colors").changed() {
-                    changed = true;
-                }
+                changed |= ui.add(egui::Slider::new(&mut self.color_offset, 0.0..=1.0)
+                    .text("Color Offset")).changed();
             });
 
         egui::CollapsingHeader::new("🔍 Navigation")
@@ -192,44 +164,25 @@ impl Simulation2D for Mandelbrot {
 
         egui::CollapsingHeader::new("📍 Interesting Locations")
             .show(ui, |ui| {
-                if ui.button("Seahorse Valley").clicked() {
-                    self.center_x = -0.75;
-                    self.center_y = 0.1;
+                if ui.button("Main Ship").clicked() {
+                    self.center_x = -0.5;
+                    self.center_y = -0.6;
+                    self.zoom = 0.7;
+                    changed = true;
+                }
+                if ui.button("Antenna Detail").clicked() {
+                    self.center_x = -1.75;
+                    self.center_y = -0.03;
                     self.zoom = 100.0;
                     changed = true;
                 }
-                if ui.button("Elephant Valley").clicked() {
-                    self.center_x = 0.3;
-                    self.center_y = 0.0;
-                    self.zoom = 50.0;
-                    changed = true;
-                }
-                if ui.button("Spiral").clicked() {
-                    self.center_x = -0.7269;
-                    self.center_y = 0.1889;
+                if ui.button("Mast Detail").clicked() {
+                    self.center_x = -1.762;
+                    self.center_y = 0.028;
                     self.zoom = 500.0;
                     changed = true;
                 }
-                if ui.button("Triple Spiral").clicked() {
-                    self.center_x = -0.1011;
-                    self.center_y = 0.9563;
-                    self.zoom = 1000.0;
-                    changed = true;
-                }
-                if ui.button("Mini Mandelbrot").clicked() {
-                    self.center_x = -0.7453;
-                    self.center_y = 0.1127;
-                    self.zoom = 5000.0;
-                    changed = true;
-                }
             });
-
-        // Handle color cycling animation
-        if self.color_cycling {
-            let dt = ui.input(|i| i.stable_dt);
-            self.cycle_time = (self.cycle_time + dt * 0.1) % 1.0;
-            changed = true;
-        }
 
         changed
     }

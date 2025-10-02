@@ -39,12 +39,14 @@ impl ComplexSystemsApp {
         let simulations_2d: Vec<Simulation2DBox> = vec![
             Box::new(mandelbrot::Mandelbrot::new()),
             Box::new(julia::Julia::new()),
+            Box::new(burning_ship::BurningShip::new()),
             Box::new(game_of_life::GameOfLife::new()),
             Box::new(cellular_automaton::CellularAutomaton::new(30)),
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
             Box::new(lorenz::LorenzAttractor::new()),
+            Box::new(rossler::RosslerAttractor::new()),
         ];
 
         Self {
@@ -64,60 +66,64 @@ impl eframe::App for ComplexSystemsApp {
         ctx.request_repaint();
 
         egui::SidePanel::left("control_panel")
-            .min_width(300.0)
+            .min_width(320.0)
+            .max_width(400.0)
+            .resizable(true)
             .show(ctx, |ui| {
-                ui.heading("Complex Systems Visualizer");
+                ui.vertical_centered(|ui| {
+                    ui.heading("🌌 Complex Systems Visualizer");
+                });
                 ui.separator();
 
                 ui.horizontal(|ui| {
-                    ui.label("View Mode:");
-                    if ui.selectable_label(matches!(self.sim_type, SimulationType::TwoD), "2D").clicked() {
+                    ui.label("📊 View Mode:");
+                    if ui.selectable_label(matches!(self.sim_type, SimulationType::TwoD), "🖼 2D").clicked() {
                         self.sim_type = SimulationType::TwoD;
                     }
-                    if ui.selectable_label(matches!(self.sim_type, SimulationType::ThreeD), "3D").clicked() {
+                    if ui.selectable_label(matches!(self.sim_type, SimulationType::ThreeD), "🎲 3D").clicked() {
                         self.sim_type = SimulationType::ThreeD;
                     }
                 });
 
                 ui.separator();
 
-                match self.sim_type {
-                    SimulationType::TwoD => {
-                        ui.heading("2D Simulations");
-                        egui::ComboBox::from_label("Select Simulation")
-                            .selected_text(self.simulations_2d[self.sim_2d_index].name())
-                            .show_ui(ui, |ui| {
-                                for (i, sim) in self.simulations_2d.iter().enumerate() {
-                                    if ui.selectable_value(&mut self.sim_2d_index, i, sim.name()).clicked() {
-                                        self.viewer_2d.needs_update = true;
+                egui::ScrollArea::vertical().show(ui, |ui| {
+
+                    match self.sim_type {
+                        SimulationType::TwoD => {
+                            egui::ComboBox::from_label("🎨 Select Simulation")
+                                .selected_text(self.simulations_2d[self.sim_2d_index].name())
+                                .show_ui(ui, |ui| {
+                                    for (i, sim) in self.simulations_2d.iter().enumerate() {
+                                        if ui.selectable_value(&mut self.sim_2d_index, i, sim.name()).clicked() {
+                                            self.viewer_2d.needs_update = true;
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                        ui.separator();
+                            ui.separator();
 
-                        if self.simulations_2d[self.sim_2d_index].ui_parameters(ui) {
-                            self.viewer_2d.needs_update = true;
+                            if self.simulations_2d[self.sim_2d_index].ui_parameters(ui) {
+                                self.viewer_2d.needs_update = true;
+                            }
+                        }
+                        SimulationType::ThreeD => {
+                            egui::ComboBox::from_label("🌀 Select Simulation")
+                                .selected_text(self.simulations_3d[self.sim_3d_index].name())
+                                .show_ui(ui, |ui| {
+                                    for (i, sim) in self.simulations_3d.iter().enumerate() {
+                                        ui.selectable_value(&mut self.sim_3d_index, i, sim.name());
+                                    }
+                                });
+
+                            ui.separator();
+
+                            self.simulations_3d[self.sim_3d_index].ui_parameters(ui);
                         }
                     }
-                    SimulationType::ThreeD => {
-                        ui.heading("3D Simulations");
-                        egui::ComboBox::from_label("Select Simulation")
-                            .selected_text(self.simulations_3d[self.sim_3d_index].name())
-                            .show_ui(ui, |ui| {
-                                for (i, sim) in self.simulations_3d.iter().enumerate() {
-                                    ui.selectable_value(&mut self.sim_3d_index, i, sim.name());
-                                }
-                            });
-
-                        ui.separator();
-
-                        self.simulations_3d[self.sim_3d_index].ui_parameters(ui);
-                    }
-                }
+                });
 
                 ui.separator();
-
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                     ui.horizontal(|ui| {
                         ui.spacing_mut().item_spacing.x = 0.0;
