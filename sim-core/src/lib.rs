@@ -6,6 +6,19 @@ pub mod cellular_automaton;
 pub mod burning_ship;
 pub mod rossler;
 
+// Additional 3D attractors
+pub mod aizawa;
+pub mod halvorsen;
+pub mod dadras;
+pub mod thomas;
+pub mod chen;
+
+// Animated 2D simulations
+pub mod double_pendulum;
+pub mod reaction_diffusion;
+pub mod lissajous;
+pub mod wave_interference;
+
 // Generative patterns module
 pub mod generative;
 

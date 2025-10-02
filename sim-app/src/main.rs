@@ -46,6 +46,12 @@ impl ComplexSystemsApp {
             Box::new(game_of_life::GameOfLife::new()),
             Box::new(cellular_automaton::CellularAutomaton::new(30)),
 
+            // Animated Simulations
+            Box::new(double_pendulum::DoublePendulum::new()),
+            Box::new(reaction_diffusion::ReactionDiffusion::new()),
+            Box::new(lissajous::LissajousCurves::new()),
+            Box::new(wave_interference::WaveInterference::new()),
+
             // Generative Patterns
             Box::new(generative::KochSnowflake::new()),
             Box::new(generative::Phyllotaxis::new()),
@@ -56,8 +62,16 @@ impl ComplexSystemsApp {
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
+            // Classic Attractors
             Box::new(lorenz::LorenzAttractor::new()),
             Box::new(rossler::RosslerAttractor::new()),
+
+            // Additional Chaotic Attractors
+            Box::new(aizawa::AizawaAttractor::new()),
+            Box::new(halvorsen::HalvorsenAttractor::new()),
+            Box::new(dadras::DadrasAttractor::new()),
+            Box::new(thomas::ThomasAttractor::new()),
+            Box::new(chen::ChenAttractor::new()),
         ];
 
         Self {
