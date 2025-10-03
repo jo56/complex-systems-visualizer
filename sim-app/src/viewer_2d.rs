@@ -3,6 +3,9 @@ use sim_core::Simulation2D;
 
 pub struct Viewer2D {
     pub needs_update: bool,
+    pub scale: f32,
+    pub pan_x: f32,
+    pub pan_y: f32,
     texture: Option<egui::TextureHandle>,
     width: usize,
     height: usize,
@@ -12,16 +15,19 @@ impl Viewer2D {
     pub fn new() -> Self {
         Self {
             needs_update: true,
+            scale: 1.0,
+            pan_x: 0.0,
+            pan_y: 0.0,
             texture: None,
             width: 800,
             height: 600,
         }
     }
 
-    pub fn show(&mut self, ui: &mut egui::Ui, simulation: &Box<dyn Simulation2D>) {
+    pub fn show(&mut self, ui: &mut egui::Ui, simulation: &mut Box<dyn Simulation2D>) {
         let available_size = ui.available_size();
-        let width = available_size.x as usize;
-        let height = available_size.y as usize;
+        let width = (available_size.x * self.scale) as usize;
+        let height = (available_size.y * self.scale) as usize;
 
         // Check if we need to recompute
         if self.needs_update || width != self.width || height != self.height {
@@ -56,10 +62,32 @@ impl Viewer2D {
             self.needs_update = false;
         }
 
-        // Display texture
+        // Create an interactive area for the image
         if let Some(texture) = &self.texture {
-            let size = egui::vec2(width as f32, height as f32);
-            ui.image((texture.id(), size));
+            let display_size = egui::vec2(available_size.x, available_size.y);
+
+            // Create a scrollable area if image is larger than display
+            let response = ui.allocate_rect(
+                egui::Rect::from_min_size(ui.cursor().min, display_size),
+                egui::Sense::click_and_drag(),
+            );
+
+            // Handle dragging for panning
+            if response.dragged() && simulation.supports_zoom() {
+                let delta = response.drag_delta();
+                // Adjust the simulation's center position
+                simulation.adjust_center(delta.x as f64, delta.y as f64, width, height);
+                self.needs_update = true;
+            }
+
+            // Draw the image
+            let rect = response.rect;
+            ui.painter().image(
+                texture.id(),
+                rect,
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
         }
     }
 }

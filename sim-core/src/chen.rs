@@ -1,4 +1,4 @@
-use crate::{Color, ColorScheme, Simulation3D};
+use crate::{ColorScheme, Simulation3D};
 
 pub struct ChenAttractor {
     pub a: f32,

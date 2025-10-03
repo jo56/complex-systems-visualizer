@@ -61,7 +61,7 @@ impl Phyllotaxis {
         Self::default()
     }
 
-    fn apply_color_adjustments(&self, mut color: Color) -> Color {
+    fn apply_color_adjustments(&self, color: Color) -> Color {
         let (h, s, v) = self.rgb_to_hsv(color);
         let new_h = (h + self.hue_shift * 360.0) % 360.0;
         let new_s = (s * self.saturation).clamp(0.0, 1.0);

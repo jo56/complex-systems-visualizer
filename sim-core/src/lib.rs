@@ -22,6 +22,35 @@ pub mod wave_interference;
 // Generative patterns module
 pub mod generative;
 
+// New complexity simulations
+pub mod langtons_ant;
+pub mod cyclic_ca;
+pub mod dla;
+pub mod sandpile;
+
+// Enhanced 3D simulations
+pub mod particle_attractor_3d;
+pub mod boids_3d;
+
+// Impressive 3D visualizations
+pub mod dna_helix;
+pub mod torus_knot;
+pub mod galaxy_spiral;
+
+// Complex emergent 2D simulations
+pub mod slime_mold;
+pub mod falling_sand;
+
+// Diverse 3D particle simulations
+pub mod nbody_gravity;
+pub mod fluid_sph;
+pub mod magnetic_field;
+
+// Radical 3D animations
+pub mod vortex_turbulence;
+pub mod lightning_bolt;
+pub mod fractal_tree_3d;
+
 /// Color representation in RGB format
 #[derive(Debug, Clone, Copy)]
 pub struct Color {
@@ -377,6 +406,21 @@ pub trait Simulation2D: Send + Sync {
 
     /// Get UI parameters for egui controls
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool;
+
+    /// Check if this simulation supports zoom/pan (default: false)
+    fn supports_zoom(&self) -> bool {
+        false
+    }
+
+    /// Adjust center position (for drag-to-pan)
+    fn adjust_center(&mut self, _dx: f64, _dy: f64, _width: usize, _height: usize) {
+        // Default: do nothing
+    }
+
+    /// Get current zoom level
+    fn get_zoom(&self) -> f64 {
+        1.0
+    }
 }
 
 /// Trait for 3D simulations

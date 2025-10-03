@@ -1,3 +1,6 @@
+// Hide console window on Windows in release builds
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 mod viewer_2d;
 mod viewer_3d;
 
@@ -8,6 +11,7 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1280.0, 800.0])
+            .with_position([200.0, 50.0])
             .with_title("Complex Systems Visualizer"),
         ..Default::default()
     };
@@ -42,9 +46,15 @@ impl ComplexSystemsApp {
             Box::new(julia::Julia::new()),
             Box::new(burning_ship::BurningShip::new()),
 
-            // Cellular Systems
+            // Cellular Systems & Emergent Complexity
             Box::new(game_of_life::GameOfLife::new()),
             Box::new(cellular_automaton::CellularAutomaton::new(30)),
+            Box::new(langtons_ant::LangtonsAnt::new()),
+            Box::new(cyclic_ca::CyclicCA::new()),
+
+            // Growth & Self-Organization
+            Box::new(dla::DLA::new()),
+            Box::new(sandpile::Sandpile::new()),
 
             // Animated Simulations
             Box::new(double_pendulum::DoublePendulum::new()),
@@ -59,9 +69,22 @@ impl ComplexSystemsApp {
             Box::new(generative::Boids::new()),
             Box::new(generative::DeJongAttractor::new()),
             Box::new(generative::CliffordAttractor::new()),
+
+            // Complex Emergent Simulations
+            Box::new(slime_mold::SlimeMold::new()),
+            Box::new(falling_sand::FallingSand::new()),
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
+            // Stunning 3D Visualizations
+            Box::new(dna_helix::DNAHelix::new()),
+            Box::new(torus_knot::TorusKnot::new()),
+            Box::new(galaxy_spiral::GalaxySpiral::new()),
+
+            // Enhanced Particle Systems
+            Box::new(particle_attractor_3d::ParticleAttractor3D::new()),
+            Box::new(boids_3d::Boids3D::new()),
+
             // Classic Attractors
             Box::new(lorenz::LorenzAttractor::new()),
             Box::new(rossler::RosslerAttractor::new()),
@@ -72,6 +95,16 @@ impl ComplexSystemsApp {
             Box::new(dadras::DadrasAttractor::new()),
             Box::new(thomas::ThomasAttractor::new()),
             Box::new(chen::ChenAttractor::new()),
+
+            // Diverse Particle Simulations
+            Box::new(nbody_gravity::NBodyGravity::new()),
+            Box::new(fluid_sph::FluidSPH::new()),
+            Box::new(magnetic_field::MagneticField::new()),
+
+            // Radical 3D Animations
+            Box::new(vortex_turbulence::VortexTurbulence::new()),
+            Box::new(lightning_bolt::LightningBolt::new()),
+            Box::new(fractal_tree_3d::FractalTree3D::new()),
         ];
 
         Self {
@@ -109,6 +142,45 @@ impl eframe::App for ComplexSystemsApp {
                         self.sim_type = SimulationType::ThreeD;
                     }
                 });
+
+                ui.separator();
+
+                // Global scale/zoom controls
+                match self.sim_type {
+                    SimulationType::TwoD => {
+                        ui.horizontal(|ui| {
+                            ui.label("🔍 Pattern Detail:");
+                            if ui.add(egui::Slider::new(&mut self.viewer_2d.scale, 0.25..=2.0)
+                                .text("Scale")).changed() {
+                                self.viewer_2d.needs_update = true;
+                                // Reset pan when scale changes to prevent shift
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
+                            }
+                            if ui.button("Reset Scale").clicked() {
+                                self.viewer_2d.scale = 1.0;
+                                self.viewer_2d.needs_update = true;
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
+                            }
+                            if ui.button("Reset Pan").clicked() {
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
+                            }
+                        });
+                        ui.label(format!("📐 Resolution: {}x{} pixels",
+                            (800.0 * self.viewer_2d.scale) as i32,
+                            (600.0 * self.viewer_2d.scale) as i32));
+                        ui.label("💡 Tip: Drag to pan when zoomed");
+                    }
+                    SimulationType::ThreeD => {
+                        ui.horizontal(|ui| {
+                            ui.label("🔍 View Zoom:");
+                            ui.add(egui::Slider::new(&mut self.viewer_3d.zoom, 0.5..=5.0)
+                                .text("Zoom"));
+                        });
+                    }
+                }
 
                 ui.separator();
 
@@ -162,7 +234,7 @@ impl eframe::App for ComplexSystemsApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             match self.sim_type {
                 SimulationType::TwoD => {
-                    self.viewer_2d.show(ui, &self.simulations_2d[self.sim_2d_index]);
+                    self.viewer_2d.show(ui, &mut self.simulations_2d[self.sim_2d_index]);
                 }
                 SimulationType::ThreeD => {
                     let dt = ui.input(|i| i.stable_dt);

@@ -26,7 +26,12 @@ impl Default for RosslerAttractor {
 
 impl RosslerAttractor {
     pub fn new() -> Self {
-        Self::default()
+        let mut attractor = Self::default();
+        // Pre-populate with points so it's visible immediately
+        for _ in 0..500 {
+            attractor.step(0.016);  // Simulate ~30 frames
+        }
+        attractor
     }
 
     fn compute_derivatives(&self, pos: [f32; 3]) -> [f32; 3] {

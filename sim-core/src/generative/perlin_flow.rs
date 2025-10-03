@@ -47,6 +47,9 @@ pub struct PerlinFlow {
     noise: Perlin,
     animation_time: f32,
     trail_history: Vec<Vec<(f32, f32)>>,
+    last_width: usize,
+    last_height: usize,
+    needs_init: bool,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -113,6 +116,9 @@ impl Default for PerlinFlow {
             noise: Perlin::new(42),
             animation_time: 0.0,
             trail_history: Vec::new(),
+            last_width: 800,
+            last_height: 600,
+            needs_init: true,
         }
     }
 }
@@ -125,6 +131,9 @@ impl PerlinFlow {
     }
 
     fn init_particles(&mut self, width: usize, height: usize) {
+        self.last_width = width;
+        self.last_height = height;
+        self.needs_init = false;
         let mut rng = rand::thread_rng();
         self.particles.clear();
         self.trail_history.clear();
@@ -302,7 +311,8 @@ impl PerlinFlow {
         }
     }
 
-    fn apply_color_adjustments(&self, mut color: Color) -> Color {
+    #[allow(dead_code)]
+    fn apply_color_adjustments(&self, color: Color) -> Color {
         let (h, s, v) = self.rgb_to_hsv(color);
         let new_h = (h + self.hue_shift * 360.0) % 360.0;
         let new_s = (s * self.saturation).clamp(0.0, 1.0);
@@ -311,6 +321,7 @@ impl PerlinFlow {
         Color::from_hsv(new_h, new_s, new_v)
     }
 
+    #[allow(dead_code)]
     fn rgb_to_hsv(&self, color: Color) -> (f32, f32, f32) {
         let r = color.r as f32 / 255.0;
         let g = color.g as f32 / 255.0;
@@ -394,7 +405,7 @@ impl Simulation2D for PerlinFlow {
             for trail in &self.trail_history {
                 for i in 0..trail.len().saturating_sub(1) {
                     let (x1, y1) = trail[i];
-                    let (x2, y2) = trail[i + 1];
+                    let (_x2, _y2) = trail[i + 1];
 
                     if x1 >= 0.0 && x1 < width as f32 && y1 >= 0.0 && y1 < height as f32 {
                         let alpha = i as f32 / trail.len() as f32;
@@ -422,9 +433,9 @@ impl Simulation2D for PerlinFlow {
             if self.fade_by_lifetime {
                 let alpha = particle.lifetime / particle.max_lifetime;
                 color = Color::from_rgb(
-                    ((color.r as f32 * alpha) as u8),
-                    ((color.g as f32 * alpha) as u8),
-                    ((color.b as f32 * alpha) as u8),
+                    (color.r as f32 * alpha) as u8,
+                    (color.g as f32 * alpha) as u8,
+                    (color.b as f32 * alpha) as u8,
                 );
             }
 
@@ -436,6 +447,12 @@ impl Simulation2D for PerlinFlow {
 
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool {
         let mut changed = false;
+
+        // Check if we need to reinitialize with actual canvas size
+        // This happens on the first frame when we get the real dimensions
+        if self.needs_init {
+            // Will be initialized on first compute() with actual canvas size
+        }
 
         ui.heading("Perlin Flow Field");
 
@@ -589,7 +606,6 @@ impl Simulation2D for PerlinFlow {
         let dt = ui.input(|i| i.stable_dt);
         if self.animate {
             self.animation_time += dt;
-            changed = true;
         }
 
         // Reinitialize particles if count changed
@@ -597,7 +613,6 @@ impl Simulation2D for PerlinFlow {
         if current_count != self.particle_count {
             let size = ui.available_size();
             self.init_particles(size.x as usize, size.y as usize);
-            changed = true;
         }
 
         // Update particles every frame

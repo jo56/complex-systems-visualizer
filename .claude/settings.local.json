@@ -3,7 +3,14 @@
     "allow": [
       "WebFetch(domain:github.com)",
       "Bash(cargo build:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cargo check:*)",
+      "Bash(cargo run:*)",
+      "Bash(RUST_BACKTRACE=1 cargo run)",
+      "Bash(set RUST_BACKTRACE=1)",
+      "Bash(timeout:*)",
+      "Bash(cargo fix:*)"
     ],
     "deny": [],
     "ask": []
