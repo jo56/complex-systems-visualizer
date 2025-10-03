@@ -64,7 +64,7 @@ impl TorusKnot {
                     let r_next = self.major_radius + self.minor_radius * (self.q as f32 * t_next).cos();
                     let dx = r_next * (self.p as f32 * t_next).cos() - x;
                     let dy = r_next * (self.p as f32 * t_next).sin() - y;
-                    let dz = self.minor_radius * (self.q as f32 * t_next).sin() - z;
+                    let _dz = self.minor_radius * (self.q as f32 * t_next).sin() - z;
 
                     // Create a simple perpendicular vector
                     let perp_x = -dy;

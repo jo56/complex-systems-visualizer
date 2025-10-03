@@ -159,9 +159,6 @@ impl Simulation2D for ReactionDiffusion {
             .show(ui, |ui| {
                 if ui.add(egui::Slider::new(&mut self.resolution, 32..=256)
                     .text("Resolution")).changed() {
-                    let old_width = self.width;
-                    let old_height = self.height;
-
                     self.width = self.resolution;
                     self.height = self.resolution;
                     let size = self.width * self.height;
@@ -233,8 +230,6 @@ impl Simulation2D for ReactionDiffusion {
                     self.grid_b[y * self.width + x] = 1.0;
                 }
             }
-
-            changed = true;
         }
 
         // Run simulation steps

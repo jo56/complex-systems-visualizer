@@ -139,14 +139,19 @@ impl eframe::App for ComplexSystemsApp {
                                 .text("Scale")).changed() {
                                 self.viewer_2d.needs_update = true;
                             }
-                            if ui.button("Reset").clicked() {
+                            if ui.button("Reset Scale").clicked() {
                                 self.viewer_2d.scale = 1.0;
                                 self.viewer_2d.needs_update = true;
+                            }
+                            if ui.button("Reset Pan").clicked() {
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
                             }
                         });
                         ui.label(format!("📐 Resolution: {}x{} pixels",
                             (800.0 * self.viewer_2d.scale) as i32,
                             (600.0 * self.viewer_2d.scale) as i32));
+                        ui.label("💡 Tip: Drag to pan when zoomed");
                     }
                     SimulationType::ThreeD => {
                         ui.horizontal(|ui| {

@@ -1,5 +1,4 @@
 use crate::{Color, ColorScheme, Simulation2D};
-use rand::Rng;
 
 // De Jong (Peter de Jong) Attractor
 pub struct DeJongAttractor {
@@ -124,7 +123,7 @@ impl DeJongAttractor {
         Self::default()
     }
 
-    fn apply_color_adjustments(&self, mut color: Color) -> Color {
+    fn apply_color_adjustments(&self, color: Color) -> Color {
         let (h, s, v) = self.rgb_to_hsv(color);
         let new_h = (h + self.hue_shift * 360.0) % 360.0;
         let new_s = (s * self.saturation).clamp(0.0, 1.0);
@@ -195,7 +194,7 @@ impl CliffordAttractor {
         Self::default()
     }
 
-    fn apply_color_adjustments(&self, mut color: Color) -> Color {
+    fn apply_color_adjustments(&self, color: Color) -> Color {
         let (h, s, v) = self.rgb_to_hsv(color);
         let new_h = (h + self.hue_shift * 360.0) % 360.0;
         let new_s = (s * self.saturation).clamp(0.0, 1.0);
@@ -317,9 +316,9 @@ impl Simulation2D for DeJongAttractor {
                 if self.fade_by_age {
                     let age_t = i as f32 / self.point_count as f32;
                     color = Color::from_rgb(
-                        ((color.r as f32 * age_t) as u8),
-                        ((color.g as f32 * age_t) as u8),
-                        ((color.b as f32 * age_t) as u8),
+                        (color.r as f32 * age_t) as u8,
+                        (color.g as f32 * age_t) as u8,
+                        (color.b as f32 * age_t) as u8,
                     );
                 }
 
@@ -519,9 +518,9 @@ impl Simulation2D for CliffordAttractor {
                 if self.fade_by_age {
                     let age_t = i as f32 / self.point_count as f32;
                     color = Color::from_rgb(
-                        ((color.r as f32 * age_t) as u8),
-                        ((color.g as f32 * age_t) as u8),
-                        ((color.b as f32 * age_t) as u8),
+                        (color.r as f32 * age_t) as u8,
+                        (color.g as f32 * age_t) as u8,
+                        (color.b as f32 * age_t) as u8,
                     );
                 }
 

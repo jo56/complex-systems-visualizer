@@ -281,7 +281,6 @@ impl Simulation2D for DoublePendulum {
             self.velocity1 = 0.0;
             self.velocity2 = 0.0;
             self.trace.clear();
-            changed = true;
         }
 
         // Update simulation

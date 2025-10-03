@@ -7,12 +7,13 @@ pub struct Viewer3D {
     pub zoom: f32,
     pub auto_rotate: bool,
     pub point_size: f32,
-    pub color_mode: ColorMode,
-    pub background_style: BackgroundStyle,
+    color_mode: ColorMode,
+    background_style: BackgroundStyle,
     texture: Option<egui::TextureHandle>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 enum ColorMode {
     Rainbow,
     Depth,
@@ -21,6 +22,7 @@ enum ColorMode {
 }
 
 #[derive(Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 enum BackgroundStyle {
     Gradient,
     Black,
@@ -119,51 +121,72 @@ impl Viewer3D {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn show_controls(&mut self, ui: &mut egui::Ui) {
+        egui::CollapsingHeader::new("🎮 View Controls")
+            .default_open(true)
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Rotation X:");
+                    ui.add(egui::Slider::new(&mut self.rotation_x, 0.0..=std::f32::consts::TAU));
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Rotation Y:");
+                    ui.add(egui::Slider::new(&mut self.rotation_y, 0.0..=std::f32::consts::TAU));
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Point Size:");
+                    ui.add(egui::Slider::new(&mut self.point_size, 1.0..=15.0));
+                });
+
+                ui.checkbox(&mut self.auto_rotate, "Auto-Rotate");
+
+                if ui.button("Reset View").clicked() {
+                    self.rotation_x = 0.3;
+                    self.rotation_y = 0.7;
+                }
+            });
+
+        egui::CollapsingHeader::new("🎨 Visual Settings")
+            .default_open(true)
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Color Mode:");
+                    egui::ComboBox::from_label("")
+                        .selected_text(match self.color_mode {
+                            ColorMode::Rainbow => "Rainbow",
+                            ColorMode::Depth => "Depth",
+                            ColorMode::Velocity => "Velocity",
+                            ColorMode::Solid => "Solid",
+                        })
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.color_mode, ColorMode::Rainbow, "Rainbow");
+                            ui.selectable_value(&mut self.color_mode, ColorMode::Depth, "Depth");
+                            ui.selectable_value(&mut self.color_mode, ColorMode::Velocity, "Velocity");
+                            ui.selectable_value(&mut self.color_mode, ColorMode::Solid, "Solid");
+                        });
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Background:");
+                    egui::ComboBox::from_label(" ")
+                        .selected_text(match self.background_style {
+                            BackgroundStyle::Gradient => "Gradient",
+                            BackgroundStyle::Black => "Black",
+                            BackgroundStyle::Stars => "Stars",
+                        })
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.background_style, BackgroundStyle::Gradient, "Gradient");
+                            ui.selectable_value(&mut self.background_style, BackgroundStyle::Black, "Black");
+                            ui.selectable_value(&mut self.background_style, BackgroundStyle::Stars, "Stars");
+                        });
+                });
+            });
+    }
+
     pub fn show(&mut self, ui: &mut egui::Ui, simulation: &Box<dyn Simulation3D>) {
-        // Controls
-        ui.horizontal(|ui| {
-            ui.label("Rotation:");
-            ui.add(egui::Slider::new(&mut self.rotation_x, 0.0..=std::f32::consts::TAU).text("X"));
-            ui.add(egui::Slider::new(&mut self.rotation_y, 0.0..=std::f32::consts::TAU).text("Y"));
-        });
-
-        ui.horizontal(|ui| {
-            ui.add(egui::Slider::new(&mut self.zoom, 0.5..=5.0).text("Zoom"));
-            ui.add(egui::Slider::new(&mut self.point_size, 1.0..=15.0).text("Size"));
-            ui.checkbox(&mut self.auto_rotate, "Auto-Rotate");
-        });
-
-        ui.horizontal(|ui| {
-            ui.label("Color:");
-            egui::ComboBox::from_label("")
-                .selected_text(match self.color_mode {
-                    ColorMode::Rainbow => "Rainbow",
-                    ColorMode::Depth => "Depth",
-                    ColorMode::Velocity => "Velocity",
-                    ColorMode::Solid => "Solid",
-                })
-                .show_ui(ui, |ui| {
-                    ui.selectable_value(&mut self.color_mode, ColorMode::Rainbow, "Rainbow");
-                    ui.selectable_value(&mut self.color_mode, ColorMode::Depth, "Depth");
-                    ui.selectable_value(&mut self.color_mode, ColorMode::Velocity, "Velocity");
-                    ui.selectable_value(&mut self.color_mode, ColorMode::Solid, "Solid");
-                });
-
-            ui.label("Background:");
-            egui::ComboBox::from_label(" ")
-                .selected_text(match self.background_style {
-                    BackgroundStyle::Gradient => "Gradient",
-                    BackgroundStyle::Black => "Black",
-                    BackgroundStyle::Stars => "Stars",
-                })
-                .show_ui(ui, |ui| {
-                    ui.selectable_value(&mut self.background_style, BackgroundStyle::Gradient, "Gradient");
-                    ui.selectable_value(&mut self.background_style, BackgroundStyle::Black, "Black");
-                    ui.selectable_value(&mut self.background_style, BackgroundStyle::Stars, "Stars");
-                });
-        });
-
-        ui.separator();
 
         // Auto-rotation
         if self.auto_rotate {
@@ -203,9 +226,16 @@ impl Viewer3D {
             max_val = max_val.max(rotated[0]).max(rotated[1]);
         }
 
-        let range = (max_val - min_val).max(1.0);
+        // Ensure we have a valid range, even for single points or small point sets
+        let range = if max_val > min_val {
+            (max_val - min_val).max(0.1)
+        } else {
+            // Single point or all points at same location - use a default range
+            10.0
+        };
+
         let target_size = width.min(height) as f32 * 0.7;
-        let auto_scale = (target_size / range).min(10.0); // Cap at 10x scaling
+        let auto_scale = ((target_size / range).min(50.0)).max(0.5); // Cap scaling between 0.5x and 50x
 
         // Create pixel buffer
         let mut pixels = vec![egui::Color32::BLACK; width * height];

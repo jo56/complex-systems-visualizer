@@ -1,5 +1,6 @@
 use crate::Simulation3D;
 
+#[allow(dead_code)]
 struct Star {
     position: [f32; 3],
     velocity: [f32; 3],

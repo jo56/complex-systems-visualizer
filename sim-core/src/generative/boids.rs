@@ -437,7 +437,8 @@ impl Boids {
         }
     }
 
-    fn apply_color_adjustments(&self, mut color: Color) -> Color {
+    #[allow(dead_code)]
+    fn apply_color_adjustments(&self, color: Color) -> Color {
         let (h, s, v) = self.rgb_to_hsv(color);
         let new_h = (h + self.hue_shift * 360.0) % 360.0;
         let new_s = (s * self.saturation).clamp(0.0, 1.0);
@@ -446,6 +447,7 @@ impl Boids {
         Color::from_hsv(new_h, new_s, new_v)
     }
 
+    #[allow(dead_code)]
     fn rgb_to_hsv(&self, color: Color) -> (f32, f32, f32) {
         let r = color.r as f32 / 255.0;
         let g = color.g as f32 / 255.0;
@@ -785,7 +787,6 @@ impl Simulation2D for Boids {
         if current_count != self.boid_count || current_predator_count != self.predator_count {
             let size = ui.available_size();
             self.init_boids(size.x as usize, size.y as usize);
-            changed = true;
         }
 
         // Update positions

@@ -1,5 +1,6 @@
 use crate::Simulation3D;
 
+#[allow(dead_code)]
 struct Particle {
     position: [f32; 3],
     age: f32,

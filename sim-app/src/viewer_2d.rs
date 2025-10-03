@@ -4,9 +4,13 @@ use sim_core::Simulation2D;
 pub struct Viewer2D {
     pub needs_update: bool,
     pub scale: f32,
+    pub pan_x: f32,
+    pub pan_y: f32,
     texture: Option<egui::TextureHandle>,
     width: usize,
     height: usize,
+    is_dragging: bool,
+    last_mouse_pos: Option<egui::Pos2>,
 }
 
 impl Viewer2D {
@@ -14,9 +18,13 @@ impl Viewer2D {
         Self {
             needs_update: true,
             scale: 1.0,
+            pan_x: 0.0,
+            pan_y: 0.0,
             texture: None,
             width: 800,
             height: 600,
+            is_dragging: false,
+            last_mouse_pos: None,
         }
     }
 
@@ -58,10 +66,66 @@ impl Viewer2D {
             self.needs_update = false;
         }
 
-        // Display texture (scaled to fit available space)
+        // Create an interactive area for the image
         if let Some(texture) = &self.texture {
+            let image_size = egui::vec2(width as f32, height as f32);
             let display_size = egui::vec2(available_size.x, available_size.y);
-            ui.image((texture.id(), display_size));
+
+            // Create a scrollable area if image is larger than display
+            let response = ui.allocate_rect(
+                egui::Rect::from_min_size(ui.cursor().min, display_size),
+                egui::Sense::click_and_drag(),
+            );
+
+            // Handle dragging for panning
+            if response.dragged() {
+                if let Some(pointer_pos) = response.interact_pointer_pos() {
+                    if let Some(last_pos) = self.last_mouse_pos {
+                        let delta = pointer_pos - last_pos;
+                        self.pan_x += delta.x;
+                        self.pan_y += delta.y;
+
+                        // Clamp panning to keep image somewhat visible
+                        let max_pan_x = (image_size.x - display_size.x).max(0.0);
+                        let max_pan_y = (image_size.y - display_size.y).max(0.0);
+                        self.pan_x = self.pan_x.clamp(-max_pan_x, 0.0);
+                        self.pan_y = self.pan_y.clamp(-max_pan_y, 0.0);
+                    }
+                    self.last_mouse_pos = Some(pointer_pos);
+                    self.is_dragging = true;
+                }
+            } else {
+                self.last_mouse_pos = None;
+                self.is_dragging = false;
+            }
+
+            // Calculate UV coordinates for the visible portion
+            let uv_min = if image_size.x > display_size.x || image_size.y > display_size.y {
+                egui::pos2(
+                    (-self.pan_x / image_size.x).max(0.0),
+                    (-self.pan_y / image_size.y).max(0.0),
+                )
+            } else {
+                egui::pos2(0.0, 0.0)
+            };
+
+            let uv_max = if image_size.x > display_size.x || image_size.y > display_size.y {
+                egui::pos2(
+                    ((-self.pan_x + display_size.x) / image_size.x).min(1.0),
+                    ((-self.pan_y + display_size.y) / image_size.y).min(1.0),
+                )
+            } else {
+                egui::pos2(1.0, 1.0)
+            };
+
+            // Draw the image with UV mapping for panning
+            let rect = response.rect;
+            ui.painter().image(
+                texture.id(),
+                rect,
+                egui::Rect::from_min_max(uv_min, uv_max),
+                egui::Color32::WHITE,
+            );
         }
     }
 }
