@@ -1,3 +1,6 @@
+// Hide console window on Windows in release builds
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 mod viewer_2d;
 mod viewer_3d;
 
@@ -42,9 +45,15 @@ impl ComplexSystemsApp {
             Box::new(julia::Julia::new()),
             Box::new(burning_ship::BurningShip::new()),
 
-            // Cellular Systems
+            // Cellular Systems & Emergent Complexity
             Box::new(game_of_life::GameOfLife::new()),
             Box::new(cellular_automaton::CellularAutomaton::new(30)),
+            Box::new(langtons_ant::LangtonsAnt::new()),
+            Box::new(cyclic_ca::CyclicCA::new()),
+
+            // Growth & Self-Organization
+            Box::new(dla::DLA::new()),
+            Box::new(sandpile::Sandpile::new()),
 
             // Animated Simulations
             Box::new(double_pendulum::DoublePendulum::new()),
@@ -62,6 +71,10 @@ impl ComplexSystemsApp {
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
+            // Enhanced Particle Systems
+            Box::new(particle_attractor_3d::ParticleAttractor3D::new()),
+            Box::new(boids_3d::Boids3D::new()),
+
             // Classic Attractors
             Box::new(lorenz::LorenzAttractor::new()),
             Box::new(rossler::RosslerAttractor::new()),

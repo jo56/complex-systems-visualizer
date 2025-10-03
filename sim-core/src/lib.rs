@@ -22,6 +22,16 @@ pub mod wave_interference;
 // Generative patterns module
 pub mod generative;
 
+// New complexity simulations
+pub mod langtons_ant;
+pub mod cyclic_ca;
+pub mod dla;
+pub mod sandpile;
+
+// Enhanced 3D simulations
+pub mod particle_attractor_3d;
+pub mod boids_3d;
+
 /// Color representation in RGB format
 #[derive(Debug, Clone, Copy)]
 pub struct Color {

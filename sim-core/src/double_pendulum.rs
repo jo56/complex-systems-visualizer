@@ -21,8 +21,8 @@ pub struct DoublePendulum {
 impl Default for DoublePendulum {
     fn default() -> Self {
         Self {
-            length1: 200.0,
-            length2: 200.0,
+            length1: 0.2,  // Now as ratio of canvas size (0.0-1.0)
+            length2: 0.2,
             mass1: 10.0,
             mass2: 10.0,
             gravity: 1.0,
@@ -30,7 +30,7 @@ impl Default for DoublePendulum {
             trace_length: 500,
             show_trace: true,
             color_scheme: ColorScheme::Rainbow,
-            scale: 1.0,
+            scale: 1.0,  // Overall scale multiplier
             angle1: std::f32::consts::PI / 2.0,
             angle2: std::f32::consts::PI / 2.0,
             velocity1: 0.0,
@@ -45,12 +45,13 @@ impl DoublePendulum {
         Self::default()
     }
 
-    fn update(&mut self, dt: f32) {
+    fn update(&mut self, dt: f32, canvas_scale: f32) {
         let g = self.gravity;
         let m1 = self.mass1;
         let m2 = self.mass2;
-        let l1 = self.length1;
-        let l2 = self.length2;
+        // Use actual pixel lengths for physics
+        let l1 = self.length1 * canvas_scale * self.scale;
+        let l2 = self.length2 * canvas_scale * self.scale;
         let a1 = self.angle1;
         let a2 = self.angle2;
         let v1 = self.velocity1;
@@ -153,11 +154,18 @@ impl Simulation2D for DoublePendulum {
         let cx = width as f32 / 2.0;
         let cy = height as f32 / 4.0;
 
+        // Calculate canvas scale - use the smaller dimension to ensure it fits
+        let canvas_scale = width.min(height) as f32;
+
+        // Actual lengths in pixels (ratio * canvas_scale * user scale)
+        let len1_px = self.length1 * canvas_scale * self.scale;
+        let len2_px = self.length2 * canvas_scale * self.scale;
+
         // Draw trace
         if self.show_trace {
             for (i, &(x, y)) in self.trace.iter().enumerate() {
-                let px = cx + x * self.scale;
-                let py = cy + y * self.scale;
+                let px = cx + x;
+                let py = cy + y;
 
                 if px >= 0.0 && px < width as f32 && py >= 0.0 && py < height as f32 {
                     let t = i as f32 / self.trace.len() as f32;
@@ -168,11 +176,11 @@ impl Simulation2D for DoublePendulum {
         }
 
         // Calculate bob positions
-        let x1 = cx + self.length1 * self.angle1.sin() * self.scale;
-        let y1 = cy + self.length1 * self.angle1.cos() * self.scale;
+        let x1 = cx + len1_px * self.angle1.sin();
+        let y1 = cy + len1_px * self.angle1.cos();
 
-        let x2 = x1 + self.length2 * self.angle2.sin() * self.scale;
-        let y2 = y1 + self.length2 * self.angle2.cos() * self.scale;
+        let x2 = x1 + len2_px * self.angle2.sin();
+        let y2 = y1 + len2_px * self.angle2.cos();
 
         // Draw rods
         self.draw_line(&mut pixels, width, height,
@@ -199,10 +207,10 @@ impl Simulation2D for DoublePendulum {
         egui::CollapsingHeader::new("⚙ Physical Parameters")
             .default_open(true)
             .show(ui, |ui| {
-                changed |= ui.add(egui::Slider::new(&mut self.length1, 50.0..=300.0)
-                    .text("Length 1")).changed();
-                changed |= ui.add(egui::Slider::new(&mut self.length2, 50.0..=300.0)
-                    .text("Length 2")).changed();
+                changed |= ui.add(egui::Slider::new(&mut self.length1, 0.05..=0.4)
+                    .text("Length 1 (ratio)")).changed();
+                changed |= ui.add(egui::Slider::new(&mut self.length2, 0.05..=0.4)
+                    .text("Length 2 (ratio)")).changed();
 
                 changed |= ui.add(egui::Slider::new(&mut self.mass1, 1.0..=50.0)
                     .text("Mass 1")).changed();
@@ -278,8 +286,10 @@ impl Simulation2D for DoublePendulum {
 
         // Update simulation
         let dt = ui.input(|i| i.stable_dt);
+        let size = ui.available_size();
+        let canvas_scale = size.x.min(size.y);
         for _ in 0..3 {
-            self.update(dt * 10.0);
+            self.update(dt * 10.0, canvas_scale);
         }
         changed = true;
 

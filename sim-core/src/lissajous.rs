@@ -23,8 +23,8 @@ impl Default for LissajousCurves {
             freq_x: 3.0,
             freq_y: 4.0,
             phase: std::f32::consts::PI / 2.0,
-            amplitude_x: 300.0,
-            amplitude_y: 300.0,
+            amplitude_x: 0.35,  // Now as ratio of canvas size (0.0-1.0)
+            amplitude_y: 0.35,
             line_width: 2.0,
             point_count: 1000,
             color_scheme: ColorScheme::Rainbow,
@@ -108,6 +108,13 @@ impl Simulation2D for LissajousCurves {
         let cx = width as f32 / 2.0;
         let cy = height as f32 / 2.0;
 
+        // Calculate canvas scale - use smaller dimension to ensure it fits
+        let canvas_scale = width.min(height) as f32;
+
+        // Actual amplitudes in pixels
+        let amp_x = self.amplitude_x * canvas_scale;
+        let amp_y = self.amplitude_y * canvas_scale;
+
         let phase = if self.animate_phase {
             self.phase + self.animation_time * self.animation_speed
         } else {
@@ -131,8 +138,8 @@ impl Simulation2D for LissajousCurves {
         for i in 0..self.point_count {
             let t = (i as f32 / self.point_count as f32) * std::f32::consts::TAU;
 
-            let x = cx + self.amplitude_x * (freq_x * t).sin();
-            let y = cy + self.amplitude_y * (freq_y * t + phase).sin();
+            let x = cx + amp_x * (freq_x * t).sin();
+            let y = cy + amp_y * (freq_y * t + phase).sin();
 
             points.push((x, y));
         }
@@ -185,10 +192,10 @@ impl Simulation2D for LissajousCurves {
                 changed |= ui.add(egui::Slider::new(&mut self.phase, 0.0..=std::f32::consts::TAU)
                     .text("Phase")).changed();
 
-                changed |= ui.add(egui::Slider::new(&mut self.amplitude_x, 50.0..=400.0)
-                    .text("Amplitude X")).changed();
-                changed |= ui.add(egui::Slider::new(&mut self.amplitude_y, 50.0..=400.0)
-                    .text("Amplitude Y")).changed();
+                changed |= ui.add(egui::Slider::new(&mut self.amplitude_x, 0.1..=0.5)
+                    .text("Amplitude X (ratio)")).changed();
+                changed |= ui.add(egui::Slider::new(&mut self.amplitude_y, 0.1..=0.5)
+                    .text("Amplitude Y (ratio)")).changed();
             });
 
         egui::CollapsingHeader::new("🎨 Visual Settings")
