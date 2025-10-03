@@ -138,7 +138,14 @@ impl DLA {
     }
 
     pub fn reset(&mut self) {
-        self.grid.fill(None);
+        // Resize grid if dimensions changed
+        let required_size = self.grid_width * self.grid_height;
+        if self.grid.len() != required_size {
+            self.grid = vec![None; required_size];
+        } else {
+            self.grid.fill(None);
+        }
+
         // Seed with center particle
         let center_idx = self.grid_height / 2 * self.grid_width + self.grid_width / 2;
         self.grid[center_idx] = Some(0);

@@ -122,6 +122,13 @@ impl CyclicCA {
     }
 
     pub fn reset(&mut self) {
+        // Resize grids if dimensions changed
+        let required_size = self.grid_width * self.grid_height;
+        if self.grid.len() != required_size {
+            self.grid = vec![0; required_size];
+            self.next_grid = vec![0; required_size];
+        }
+
         let mut rng = rand::thread_rng();
         for cell in &mut self.grid {
             *cell = rng.gen_range(0..self.num_states as u8);

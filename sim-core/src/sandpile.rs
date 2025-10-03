@@ -140,8 +140,16 @@ impl Sandpile {
     }
 
     pub fn reset(&mut self) {
-        self.grid.fill(0);
-        self.avalanche_sites.fill(false);
+        // Resize grids if dimensions changed
+        let required_size = self.grid_width * self.grid_height;
+        if self.grid.len() != required_size {
+            self.grid = vec![0; required_size];
+            self.avalanche_sites = vec![false; required_size];
+        } else {
+            self.grid.fill(0);
+            self.avalanche_sites.fill(false);
+        }
+
         self.time_accumulator = 0.0;
         self.total_drops = 0;
         self.total_avalanches = 0;

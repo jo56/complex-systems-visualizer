@@ -32,6 +32,11 @@ pub mod sandpile;
 pub mod particle_attractor_3d;
 pub mod boids_3d;
 
+// Impressive 3D visualizations
+pub mod dna_helix;
+pub mod torus_knot;
+pub mod galaxy_spiral;
+
 /// Color representation in RGB format
 #[derive(Debug, Clone, Copy)]
 pub struct Color {

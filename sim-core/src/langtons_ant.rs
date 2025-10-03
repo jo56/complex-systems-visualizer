@@ -143,7 +143,13 @@ impl LangtonsAnt {
     }
 
     pub fn reset(&mut self) {
-        self.grid.fill(false);
+        // Resize grid if dimensions changed
+        let required_size = self.grid_width * self.grid_height;
+        if self.grid.len() != required_size {
+            self.grid = vec![false; required_size];
+        } else {
+            self.grid.fill(false);
+        }
         self.ant_x = (self.grid_width / 2) as i32;
         self.ant_y = (self.grid_height / 2) as i32;
         self.direction = Direction::Up;

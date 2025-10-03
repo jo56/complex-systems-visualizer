@@ -71,6 +71,11 @@ impl ComplexSystemsApp {
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
+            // Stunning 3D Visualizations
+            Box::new(dna_helix::DNAHelix::new()),
+            Box::new(torus_knot::TorusKnot::new()),
+            Box::new(galaxy_spiral::GalaxySpiral::new()),
+
             // Enhanced Particle Systems
             Box::new(particle_attractor_3d::ParticleAttractor3D::new()),
             Box::new(boids_3d::Boids3D::new()),
