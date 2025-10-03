@@ -406,6 +406,21 @@ pub trait Simulation2D: Send + Sync {
 
     /// Get UI parameters for egui controls
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool;
+
+    /// Check if this simulation supports zoom/pan (default: false)
+    fn supports_zoom(&self) -> bool {
+        false
+    }
+
+    /// Adjust center position (for drag-to-pan)
+    fn adjust_center(&mut self, _dx: f64, _dy: f64, _width: usize, _height: usize) {
+        // Default: do nothing
+    }
+
+    /// Get current zoom level
+    fn get_zoom(&self) -> f64 {
+        1.0
+    }
 }
 
 /// Trait for 3D simulations

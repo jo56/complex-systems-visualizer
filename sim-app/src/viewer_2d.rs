@@ -24,7 +24,7 @@ impl Viewer2D {
         }
     }
 
-    pub fn show(&mut self, ui: &mut egui::Ui, simulation: &Box<dyn Simulation2D>) {
+    pub fn show(&mut self, ui: &mut egui::Ui, simulation: &mut Box<dyn Simulation2D>) {
         let available_size = ui.available_size();
         let width = (available_size.x * self.scale) as usize;
         let height = (available_size.y * self.scale) as usize;
@@ -64,7 +64,6 @@ impl Viewer2D {
 
         // Create an interactive area for the image
         if let Some(texture) = &self.texture {
-            let image_size = egui::vec2(width as f32, height as f32);
             let display_size = egui::vec2(available_size.x, available_size.y);
 
             // Create a scrollable area if image is larger than display
@@ -73,44 +72,20 @@ impl Viewer2D {
                 egui::Sense::click_and_drag(),
             );
 
-            // Handle dragging for panning - use drag_delta() directly
-            if response.dragged() {
+            // Handle dragging for panning
+            if response.dragged() && simulation.supports_zoom() {
                 let delta = response.drag_delta();
-                self.pan_x += delta.x;
-                self.pan_y += delta.y;
-
-                // Clamp panning to keep image somewhat visible
-                let max_pan_x = (image_size.x - display_size.x).max(0.0);
-                let max_pan_y = (image_size.y - display_size.y).max(0.0);
-                self.pan_x = self.pan_x.clamp(-max_pan_x, 0.0);
-                self.pan_y = self.pan_y.clamp(-max_pan_y, 0.0);
+                // Adjust the simulation's center position
+                simulation.adjust_center(delta.x as f64, delta.y as f64, width, height);
+                self.needs_update = true;
             }
 
-            // Calculate UV coordinates for the visible portion
-            let uv_min = if image_size.x > display_size.x || image_size.y > display_size.y {
-                egui::pos2(
-                    (-self.pan_x / image_size.x).max(0.0),
-                    (-self.pan_y / image_size.y).max(0.0),
-                )
-            } else {
-                egui::pos2(0.0, 0.0)
-            };
-
-            let uv_max = if image_size.x > display_size.x || image_size.y > display_size.y {
-                egui::pos2(
-                    ((-self.pan_x + display_size.x) / image_size.x).min(1.0),
-                    ((-self.pan_y + display_size.y) / image_size.y).min(1.0),
-                )
-            } else {
-                egui::pos2(1.0, 1.0)
-            };
-
-            // Draw the image with UV mapping for panning
+            // Draw the image
             let rect = response.rect;
             ui.painter().image(
                 texture.id(),
                 rect,
-                egui::Rect::from_min_max(uv_min, uv_max),
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
                 egui::Color32::WHITE,
             );
         }

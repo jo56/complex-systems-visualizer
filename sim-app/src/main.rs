@@ -234,7 +234,7 @@ impl eframe::App for ComplexSystemsApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             match self.sim_type {
                 SimulationType::TwoD => {
-                    self.viewer_2d.show(ui, &self.simulations_2d[self.sim_2d_index]);
+                    self.viewer_2d.show(ui, &mut self.simulations_2d[self.sim_2d_index]);
                 }
                 SimulationType::ThreeD => {
                     let dt = ui.input(|i| i.stable_dt);

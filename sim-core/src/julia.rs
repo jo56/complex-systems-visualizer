@@ -7,6 +7,8 @@ pub struct Julia {
     pub c_real: f64,
     pub c_imag: f64,
     pub zoom: f64,
+    pub center_x: f64,
+    pub center_y: f64,
     pub power: f64,
     pub escape_radius: f64,
     pub color_scheme: ColorScheme,
@@ -25,6 +27,8 @@ impl Default for Julia {
             c_real: -0.7,
             c_imag: 0.27015,
             zoom: 1.0,
+            center_x: 0.0,
+            center_y: 0.0,
             power: 2.0,
             escape_radius: 2.0,
             color_scheme: ColorScheme::Ultra,
@@ -72,8 +76,8 @@ impl Julia {
         let aspect = width as f64 / height as f64;
         let range = 4.0 / self.zoom;
 
-        let real = (x as f64 / width as f64 - 0.5) * range * aspect;
-        let imag = (y as f64 / height as f64 - 0.5) * range;
+        let real = (x as f64 / width as f64 - 0.5) * range * aspect + self.center_x;
+        let imag = (y as f64 / height as f64 - 0.5) * range + self.center_y;
 
         Complex64::new(real, imag)
     }
@@ -230,5 +234,23 @@ impl Simulation2D for Julia {
         }
 
         changed
+    }
+
+    fn supports_zoom(&self) -> bool {
+        true
+    }
+
+    fn adjust_center(&mut self, dx: f64, dy: f64, width: usize, height: usize) {
+        // Convert pixel delta to world space delta
+        let aspect = width as f64 / height as f64;
+        let view_width = 4.0 / self.zoom;
+        let view_height = view_width / aspect;
+
+        self.center_x -= dx * view_width / width as f64;
+        self.center_y -= dy * view_height / height as f64;
+    }
+
+    fn get_zoom(&self) -> f64 {
+        self.zoom
     }
 }

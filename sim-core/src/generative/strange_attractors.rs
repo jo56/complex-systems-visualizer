@@ -460,6 +460,19 @@ impl Simulation2D for DeJongAttractor {
 
         changed
     }
+
+    fn supports_zoom(&self) -> bool {
+        true
+    }
+
+    fn adjust_center(&mut self, dx: f64, dy: f64, _width: usize, _height: usize) {
+        self.center_x += (dx as f32) / self.zoom;
+        self.center_y += (dy as f32) / self.zoom;
+    }
+
+    fn get_zoom(&self) -> f64 {
+        self.zoom as f64
+    }
 }
 
 impl Simulation2D for CliffordAttractor {
@@ -662,5 +675,18 @@ impl Simulation2D for CliffordAttractor {
         }
 
         changed
+    }
+
+    fn supports_zoom(&self) -> bool {
+        true
+    }
+
+    fn adjust_center(&mut self, dx: f64, dy: f64, _width: usize, _height: usize) {
+        self.center_x += (dx as f32) / self.zoom;
+        self.center_y += (dy as f32) / self.zoom;
+    }
+
+    fn get_zoom(&self) -> f64 {
+        self.zoom as f64
     }
 }
