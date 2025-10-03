@@ -11,6 +11,7 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1280.0, 800.0])
+            .with_position([100.0, 50.0])
             .with_title("Complex Systems Visualizer"),
         ..Default::default()
     };
@@ -68,6 +69,10 @@ impl ComplexSystemsApp {
             Box::new(generative::Boids::new()),
             Box::new(generative::DeJongAttractor::new()),
             Box::new(generative::CliffordAttractor::new()),
+
+            // Complex Emergent Simulations
+            Box::new(slime_mold::SlimeMold::new()),
+            Box::new(falling_sand::FallingSand::new()),
         ];
 
         let simulations_3d: Vec<Simulation3DBox> = vec![
@@ -90,6 +95,16 @@ impl ComplexSystemsApp {
             Box::new(dadras::DadrasAttractor::new()),
             Box::new(thomas::ThomasAttractor::new()),
             Box::new(chen::ChenAttractor::new()),
+
+            // Diverse Particle Simulations
+            Box::new(nbody_gravity::NBodyGravity::new()),
+            Box::new(fluid_sph::FluidSPH::new()),
+            Box::new(magnetic_field::MagneticField::new()),
+
+            // Radical 3D Animations
+            Box::new(vortex_turbulence::VortexTurbulence::new()),
+            Box::new(lightning_bolt::LightningBolt::new()),
+            Box::new(fractal_tree_3d::FractalTree3D::new()),
         ];
 
         Self {
@@ -138,10 +153,15 @@ impl eframe::App for ComplexSystemsApp {
                             if ui.add(egui::Slider::new(&mut self.viewer_2d.scale, 0.25..=2.0)
                                 .text("Scale")).changed() {
                                 self.viewer_2d.needs_update = true;
+                                // Reset pan when scale changes to prevent shift
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
                             }
                             if ui.button("Reset Scale").clicked() {
                                 self.viewer_2d.scale = 1.0;
                                 self.viewer_2d.needs_update = true;
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
                             }
                             if ui.button("Reset Pan").clicked() {
                                 self.viewer_2d.pan_x = 0.0;

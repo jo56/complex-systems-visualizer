@@ -9,8 +9,6 @@ pub struct Viewer2D {
     texture: Option<egui::TextureHandle>,
     width: usize,
     height: usize,
-    is_dragging: bool,
-    last_mouse_pos: Option<egui::Pos2>,
 }
 
 impl Viewer2D {
@@ -23,8 +21,6 @@ impl Viewer2D {
             texture: None,
             width: 800,
             height: 600,
-            is_dragging: false,
-            last_mouse_pos: None,
         }
     }
 
@@ -77,26 +73,17 @@ impl Viewer2D {
                 egui::Sense::click_and_drag(),
             );
 
-            // Handle dragging for panning
+            // Handle dragging for panning - use drag_delta() directly
             if response.dragged() {
-                if let Some(pointer_pos) = response.interact_pointer_pos() {
-                    if let Some(last_pos) = self.last_mouse_pos {
-                        let delta = pointer_pos - last_pos;
-                        self.pan_x += delta.x;
-                        self.pan_y += delta.y;
+                let delta = response.drag_delta();
+                self.pan_x += delta.x;
+                self.pan_y += delta.y;
 
-                        // Clamp panning to keep image somewhat visible
-                        let max_pan_x = (image_size.x - display_size.x).max(0.0);
-                        let max_pan_y = (image_size.y - display_size.y).max(0.0);
-                        self.pan_x = self.pan_x.clamp(-max_pan_x, 0.0);
-                        self.pan_y = self.pan_y.clamp(-max_pan_y, 0.0);
-                    }
-                    self.last_mouse_pos = Some(pointer_pos);
-                    self.is_dragging = true;
-                }
-            } else {
-                self.last_mouse_pos = None;
-                self.is_dragging = false;
+                // Clamp panning to keep image somewhat visible
+                let max_pan_x = (image_size.x - display_size.x).max(0.0);
+                let max_pan_y = (image_size.y - display_size.y).max(0.0);
+                self.pan_x = self.pan_x.clamp(-max_pan_x, 0.0);
+                self.pan_y = self.pan_y.clamp(-max_pan_y, 0.0);
             }
 
             // Calculate UV coordinates for the visible portion

@@ -37,6 +37,20 @@ pub mod dna_helix;
 pub mod torus_knot;
 pub mod galaxy_spiral;
 
+// Complex emergent 2D simulations
+pub mod slime_mold;
+pub mod falling_sand;
+
+// Diverse 3D particle simulations
+pub mod nbody_gravity;
+pub mod fluid_sph;
+pub mod magnetic_field;
+
+// Radical 3D animations
+pub mod vortex_turbulence;
+pub mod lightning_bolt;
+pub mod fractal_tree_3d;
+
 /// Color representation in RGB format
 #[derive(Debug, Clone, Copy)]
 pub struct Color {
