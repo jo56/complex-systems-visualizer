@@ -185,10 +185,6 @@ impl Simulation2D for Julia {
         egui::CollapsingHeader::new("🔍 Navigation")
             .default_open(true)
             .show(ui, |ui| {
-                changed |= ui.add(egui::Slider::new(&mut self.zoom, 0.1..=1000.0)
-                    .logarithmic(true)
-                    .text("Zoom")).changed();
-
                 if ui.button("🏠 Reset").clicked() {
                     *self = Self::default();
                     changed = true;
@@ -234,23 +230,5 @@ impl Simulation2D for Julia {
         }
 
         changed
-    }
-
-    fn supports_zoom(&self) -> bool {
-        true
-    }
-
-    fn adjust_center(&mut self, dx: f64, dy: f64, width: usize, height: usize) {
-        // Convert pixel delta to world space delta
-        let aspect = width as f64 / height as f64;
-        let view_width = 4.0 / self.zoom;
-        let view_height = view_width / aspect;
-
-        self.center_x -= dx * view_width / width as f64;
-        self.center_y -= dy * view_height / height as f64;
-    }
-
-    fn get_zoom(&self) -> f64 {
-        self.zoom
     }
 }

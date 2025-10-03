@@ -77,6 +77,16 @@ impl Mandelbrot {
         Complex64::new(real, imag)
     }
 
+    fn pixel_to_complex_with_params(&self, x: usize, y: usize, width: usize, height: usize, zoom: f64, center_x: f64, center_y: f64) -> Complex64 {
+        let aspect = width as f64 / height as f64;
+        let range = 4.0 / zoom;
+
+        let real = center_x + (x as f64 / width as f64 - 0.5) * range * aspect;
+        let imag = center_y + (y as f64 / height as f64 - 0.5) * range;
+
+        Complex64::new(real, imag)
+    }
+
     fn iterations_to_color(&self, iterations: u32, smooth_iter: f64) -> Color {
         if iterations == self.max_iterations {
             return Color::BLACK;
@@ -168,20 +178,16 @@ impl Simulation2D for Mandelbrot {
         egui::CollapsingHeader::new("🔍 Navigation")
             .default_open(true)
             .show(ui, |ui| {
-                changed |= ui.add(egui::Slider::new(&mut self.zoom, 0.1..=10000.0)
-                    .logarithmic(true)
-                    .text("Zoom")).changed();
-
                 ui.horizontal(|ui| {
                     ui.label("Center X:");
                     changed |= ui.add(egui::DragValue::new(&mut self.center_x)
-                        .speed(0.01 / self.zoom)).changed();
+                        .speed(0.01)).changed();
                 });
 
                 ui.horizontal(|ui| {
                     ui.label("Center Y:");
                     changed |= ui.add(egui::DragValue::new(&mut self.center_y)
-                        .speed(0.01 / self.zoom)).changed();
+                        .speed(0.01)).changed();
                 });
 
                 if ui.button("🏠 Reset View").clicked() {
@@ -195,31 +201,26 @@ impl Simulation2D for Mandelbrot {
                 if ui.button("Seahorse Valley").clicked() {
                     self.center_x = -0.75;
                     self.center_y = 0.1;
-                    self.zoom = 100.0;
                     changed = true;
                 }
                 if ui.button("Elephant Valley").clicked() {
                     self.center_x = 0.3;
                     self.center_y = 0.0;
-                    self.zoom = 50.0;
                     changed = true;
                 }
                 if ui.button("Spiral").clicked() {
                     self.center_x = -0.7269;
                     self.center_y = 0.1889;
-                    self.zoom = 500.0;
                     changed = true;
                 }
                 if ui.button("Triple Spiral").clicked() {
                     self.center_x = -0.1011;
                     self.center_y = 0.9563;
-                    self.zoom = 1000.0;
                     changed = true;
                 }
                 if ui.button("Mini Mandelbrot").clicked() {
                     self.center_x = -0.7453;
                     self.center_y = 0.1127;
-                    self.zoom = 5000.0;
                     changed = true;
                 }
             });
@@ -232,23 +233,5 @@ impl Simulation2D for Mandelbrot {
         }
 
         changed
-    }
-
-    fn supports_zoom(&self) -> bool {
-        true
-    }
-
-    fn adjust_center(&mut self, dx: f64, dy: f64, width: usize, height: usize) {
-        // Convert pixel delta to world space delta
-        let aspect = width as f64 / height as f64;
-        let view_width = 4.0 / self.zoom;
-        let view_height = view_width / aspect;
-
-        self.center_x -= dx * view_width / width as f64;
-        self.center_y -= dy * view_height / height as f64;
-    }
-
-    fn get_zoom(&self) -> f64 {
-        self.zoom
     }
 }

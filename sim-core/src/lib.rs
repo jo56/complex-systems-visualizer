@@ -404,23 +404,37 @@ pub trait Simulation2D: Send + Sync {
     /// Compute the simulation and return pixel data
     fn compute(&self, width: usize, height: usize) -> Vec<Color>;
 
+    /// Compute the simulation with zoom and pan (default: renders larger image and crops)
+    fn compute_with_zoom(&self, width: usize, height: usize, zoom: f64, pan_x: f64, pan_y: f64) -> Vec<Color> {
+        if zoom <= 1.0 && pan_x.abs() < 0.01 && pan_y.abs() < 0.01 {
+            return self.compute(width, height);
+        }
+
+        // Compute a larger image
+        let zoomed_width = (width as f64 * zoom) as usize;
+        let zoomed_height = (height as f64 * zoom) as usize;
+        let full_image = self.compute(zoomed_width, zoomed_height);
+
+        // Calculate starting position to crop from center, adjusted by pan
+        // Negative pan because when user drags right, we want to show more of the left side
+        let start_x = ((zoomed_width - width) as f64 / 2.0 - pan_x) as isize;
+        let start_y = ((zoomed_height - height) as f64 / 2.0 - pan_y) as isize;
+
+        // Extract the visible portion
+        let mut result = Vec::with_capacity(width * height);
+        for y in 0..height {
+            for x in 0..width {
+                let src_x = (x as isize + start_x).max(0).min(zoomed_width as isize - 1) as usize;
+                let src_y = (y as isize + start_y).max(0).min(zoomed_height as isize - 1) as usize;
+                let idx = src_y * zoomed_width + src_x;
+                result.push(full_image[idx]);
+            }
+        }
+        result
+    }
+
     /// Get UI parameters for egui controls
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool;
-
-    /// Check if this simulation supports zoom/pan (default: false)
-    fn supports_zoom(&self) -> bool {
-        false
-    }
-
-    /// Adjust center position (for drag-to-pan)
-    fn adjust_center(&mut self, _dx: f64, _dy: f64, _width: usize, _height: usize) {
-        // Default: do nothing
-    }
-
-    /// Get current zoom level
-    fn get_zoom(&self) -> f64 {
-        1.0
-    }
 }
 
 /// Trait for 3D simulations

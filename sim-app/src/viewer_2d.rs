@@ -4,6 +4,7 @@ use sim_core::Simulation2D;
 pub struct Viewer2D {
     pub needs_update: bool,
     pub scale: f32,
+    pub zoom: f32,
     pub pan_x: f32,
     pub pan_y: f32,
     texture: Option<egui::TextureHandle>,
@@ -16,6 +17,7 @@ impl Viewer2D {
         Self {
             needs_update: true,
             scale: 1.0,
+            zoom: 1.0,
             pan_x: 0.0,
             pan_y: 0.0,
             texture: None,
@@ -34,8 +36,14 @@ impl Viewer2D {
             self.width = width;
             self.height = height;
 
-            // Compute simulation
-            let colors = simulation.compute(width, height);
+            // Compute simulation with zoom and pan
+            let colors = simulation.compute_with_zoom(
+                width,
+                height,
+                self.zoom as f64,
+                self.pan_x as f64,
+                self.pan_y as f64
+            );
 
             // Convert to egui color image
             let pixels: Vec<egui::Color32> = colors
@@ -73,14 +81,14 @@ impl Viewer2D {
             );
 
             // Handle dragging for panning
-            if response.dragged() && simulation.supports_zoom() {
+            if response.dragged() && self.zoom > 1.0 {
                 let delta = response.drag_delta();
-                // Adjust the simulation's center position
-                simulation.adjust_center(delta.x as f64, delta.y as f64, width, height);
+                self.pan_x += delta.x;
+                self.pan_y += delta.y;
                 self.needs_update = true;
             }
 
-            // Draw the image
+            // Draw the image (zoom/pan is handled in compute_with_zoom)
             let rect = response.rect;
             ui.painter().image(
                 texture.id(),

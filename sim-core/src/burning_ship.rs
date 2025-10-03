@@ -140,20 +140,16 @@ impl Simulation2D for BurningShip {
         egui::CollapsingHeader::new("🔍 Navigation")
             .default_open(true)
             .show(ui, |ui| {
-                changed |= ui.add(egui::Slider::new(&mut self.zoom, 0.1..=10000.0)
-                    .logarithmic(true)
-                    .text("Zoom")).changed();
-
                 ui.horizontal(|ui| {
                     ui.label("Center X:");
                     changed |= ui.add(egui::DragValue::new(&mut self.center_x)
-                        .speed(0.01 / self.zoom)).changed();
+                        .speed(0.01)).changed();
                 });
 
                 ui.horizontal(|ui| {
                     ui.label("Center Y:");
                     changed |= ui.add(egui::DragValue::new(&mut self.center_y)
-                        .speed(0.01 / self.zoom)).changed();
+                        .speed(0.01)).changed();
                 });
 
                 if ui.button("🏠 Reset View").clicked() {
@@ -167,41 +163,20 @@ impl Simulation2D for BurningShip {
                 if ui.button("Main Ship").clicked() {
                     self.center_x = -0.5;
                     self.center_y = -0.6;
-                    self.zoom = 0.7;
                     changed = true;
                 }
                 if ui.button("Antenna Detail").clicked() {
                     self.center_x = -1.75;
                     self.center_y = -0.03;
-                    self.zoom = 100.0;
                     changed = true;
                 }
                 if ui.button("Mast Detail").clicked() {
                     self.center_x = -1.762;
                     self.center_y = 0.028;
-                    self.zoom = 500.0;
                     changed = true;
                 }
             });
 
         changed
-    }
-
-    fn supports_zoom(&self) -> bool {
-        true
-    }
-
-    fn adjust_center(&mut self, dx: f64, dy: f64, width: usize, height: usize) {
-        // Convert pixel delta to world space delta
-        let aspect = width as f64 / height as f64;
-        let view_width = 4.0 / self.zoom;
-        let view_height = view_width / aspect;
-
-        self.center_x -= dx * view_width / width as f64;
-        self.center_y -= dy * view_height / height as f64;
-    }
-
-    fn get_zoom(&self) -> f64 {
-        self.zoom
     }
 }

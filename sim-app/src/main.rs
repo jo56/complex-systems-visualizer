@@ -157,17 +157,25 @@ impl eframe::App for ComplexSystemsApp {
                                 self.viewer_2d.pan_x = 0.0;
                                 self.viewer_2d.pan_y = 0.0;
                             }
-                            if ui.button("Reset Scale").clicked() {
+                        });
+
+                        ui.horizontal(|ui| {
+                            ui.label("🔎 View Zoom:");
+                            if ui.add(egui::Slider::new(&mut self.viewer_2d.zoom, 1.0..=5.0)
+                                .text("Zoom")).changed() {
+                                // Reset pan when zoom changes
+                                self.viewer_2d.pan_x = 0.0;
+                                self.viewer_2d.pan_y = 0.0;
+                            }
+                            if ui.button("Reset").clicked() {
                                 self.viewer_2d.scale = 1.0;
+                                self.viewer_2d.zoom = 1.0;
                                 self.viewer_2d.needs_update = true;
                                 self.viewer_2d.pan_x = 0.0;
                                 self.viewer_2d.pan_y = 0.0;
                             }
-                            if ui.button("Reset Pan").clicked() {
-                                self.viewer_2d.pan_x = 0.0;
-                                self.viewer_2d.pan_y = 0.0;
-                            }
                         });
+
                         ui.label(format!("📐 Resolution: {}x{} pixels",
                             (800.0 * self.viewer_2d.scale) as i32,
                             (600.0 * self.viewer_2d.scale) as i32));
