@@ -11,7 +11,7 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1280.0, 800.0])
-            .with_position([100.0, 50.0])
+            .with_position([200.0, 50.0])
             .with_title("Complex Systems Visualizer"),
         ..Default::default()
     };
