@@ -2,13 +2,13 @@ use eframe::egui;
 use sim_core::Simulation3D;
 
 pub struct Viewer3D {
-    rotation_x: f32,
-    rotation_y: f32,
-    zoom: f32,
-    auto_rotate: bool,
-    point_size: f32,
-    color_mode: ColorMode,
-    background_style: BackgroundStyle,
+    pub rotation_x: f32,
+    pub rotation_y: f32,
+    pub zoom: f32,
+    pub auto_rotate: bool,
+    pub point_size: f32,
+    pub color_mode: ColorMode,
+    pub background_style: BackgroundStyle,
     texture: Option<egui::TextureHandle>,
 }
 
@@ -59,25 +59,29 @@ impl Viewer3D {
         [x1, y1, z2]
     }
 
-    fn project_to_screen(&self, point: [f32; 3], width: f32, height: f32) -> (f32, f32, f32) {
+    fn project_to_screen(&self, point: [f32; 3], width: f32, height: f32, scale: f32) -> (f32, f32, f32) {
         let rotated = self.rotate_point(point);
         let [x, y, z] = rotated;
 
-        // Perspective projection
-        let perspective = 200.0 / (200.0 + z);
+        // Perspective projection with auto-scaling
+        let perspective = 300.0 / (300.0 + z);
 
-        let screen_x = width / 2.0 + x * self.zoom * perspective;
-        let screen_y = height / 2.0 + y * self.zoom * perspective;
+        let screen_x = width / 2.0 + x * scale * self.zoom * perspective;
+        let screen_y = height / 2.0 + y * scale * self.zoom * perspective;
 
         (screen_x, screen_y, z)
     }
 
     fn draw_sphere(&self, pixels: &mut [egui::Color32], width: usize, height: usize,
                    cx: f32, cy: f32, radius: f32, color: egui::Color32, glow: bool) {
-        let min_x = ((cx - radius).max(0.0) as usize).min(width - 1);
-        let max_x = ((cx + radius).min(width as f32 - 1.0) as usize).min(width - 1);
-        let min_y = ((cy - radius).max(0.0) as usize).min(height - 1);
-        let max_y = ((cy + radius).min(height as f32 - 1.0) as usize).min(height - 1);
+        if width == 0 || height == 0 || radius < 0.1 {
+            return;
+        }
+
+        let min_x = ((cx - radius).max(0.0) as usize).min(width.saturating_sub(1));
+        let max_x = ((cx + radius).min(width as f32 - 1.0) as usize).min(width.saturating_sub(1));
+        let min_y = ((cy - radius).max(0.0) as usize).min(height.saturating_sub(1));
+        let max_y = ((cy + radius).min(height as f32 - 1.0) as usize).min(height.saturating_sub(1));
 
         for y in min_y..=max_y {
             for x in min_x..=max_x {
@@ -87,6 +91,9 @@ impl Viewer3D {
 
                 if dist <= radius {
                     let idx = y * width + x;
+                    if idx >= pixels.len() {
+                        continue;
+                    }
 
                     if glow {
                         // Soft glow effect
@@ -184,6 +191,22 @@ impl Viewer3D {
             return;
         }
 
+        // Calculate bounding box for auto-scaling
+        let mut min_val = f32::MAX;
+        let mut max_val = f32::MIN;
+
+        // Limit points processed for bounding box calculation to avoid hanging
+        let sample_size = points_3d.len().min(1000);
+        for point in points_3d.iter().take(sample_size) {
+            let rotated = self.rotate_point(*point);
+            min_val = min_val.min(rotated[0]).min(rotated[1]);
+            max_val = max_val.max(rotated[0]).max(rotated[1]);
+        }
+
+        let range = (max_val - min_val).max(1.0);
+        let target_size = width.min(height) as f32 * 0.7;
+        let auto_scale = (target_size / range).min(10.0); // Cap at 10x scaling
+
         // Create pixel buffer
         let mut pixels = vec![egui::Color32::BLACK; width * height];
 
@@ -233,16 +256,18 @@ impl Viewer3D {
             .iter()
             .enumerate()
             .map(|(i, &p)| {
-                let (x, y, z) = self.project_to_screen(p, width as f32, height as f32);
+                let (x, y, z) = self.project_to_screen(p, width as f32, height as f32, auto_scale);
                 (x, y, z, i)
             })
             .collect();
 
         projected.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal));
 
-        // Draw all points as spheres with glow
-        for (screen_x, screen_y, z, i) in projected.iter() {
-            if *screen_x < 0.0 || *screen_x >= width as f32 || *screen_y < 0.0 || *screen_y >= height as f32 {
+        // Draw all points as spheres with glow (limit to avoid hanging)
+        let max_points = projected.len().min(5000);
+        for (screen_x, screen_y, z, i) in projected.iter().take(max_points) {
+            if *screen_x < -100.0 || *screen_x >= width as f32 + 100.0 ||
+               *screen_y < -100.0 || *screen_y >= height as f32 + 100.0 {
                 continue;
             }
 
@@ -283,8 +308,8 @@ impl Viewer3D {
             };
 
             // Calculate size with perspective
-            let perspective_scale = 200.0 / (200.0 + z);
-            let radius = self.point_size * perspective_scale.max(0.2);
+            let perspective_scale = 300.0 / (300.0 + z);
+            let radius = (self.point_size * perspective_scale * (auto_scale / 10.0).max(0.5)).max(1.5);
 
             self.draw_sphere(&mut pixels, width, height, *screen_x, *screen_y, radius, color, true);
         }

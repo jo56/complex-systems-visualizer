@@ -47,6 +47,9 @@ pub struct PerlinFlow {
     noise: Perlin,
     animation_time: f32,
     trail_history: Vec<Vec<(f32, f32)>>,
+    last_width: usize,
+    last_height: usize,
+    needs_init: bool,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -113,6 +116,9 @@ impl Default for PerlinFlow {
             noise: Perlin::new(42),
             animation_time: 0.0,
             trail_history: Vec::new(),
+            last_width: 800,
+            last_height: 600,
+            needs_init: true,
         }
     }
 }
@@ -125,6 +131,9 @@ impl PerlinFlow {
     }
 
     fn init_particles(&mut self, width: usize, height: usize) {
+        self.last_width = width;
+        self.last_height = height;
+        self.needs_init = false;
         let mut rng = rand::thread_rng();
         self.particles.clear();
         self.trail_history.clear();
@@ -436,6 +445,12 @@ impl Simulation2D for PerlinFlow {
 
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool {
         let mut changed = false;
+
+        // Check if we need to reinitialize with actual canvas size
+        // This happens on the first frame when we get the real dimensions
+        if self.needs_init {
+            // Will be initialized on first compute() with actual canvas size
+        }
 
         ui.heading("Perlin Flow Field");
 

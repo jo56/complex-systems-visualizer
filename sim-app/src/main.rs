@@ -130,6 +130,35 @@ impl eframe::App for ComplexSystemsApp {
 
                 ui.separator();
 
+                // Global scale/zoom controls
+                match self.sim_type {
+                    SimulationType::TwoD => {
+                        ui.horizontal(|ui| {
+                            ui.label("🔍 Pattern Detail:");
+                            if ui.add(egui::Slider::new(&mut self.viewer_2d.scale, 0.25..=2.0)
+                                .text("Scale")).changed() {
+                                self.viewer_2d.needs_update = true;
+                            }
+                            if ui.button("Reset").clicked() {
+                                self.viewer_2d.scale = 1.0;
+                                self.viewer_2d.needs_update = true;
+                            }
+                        });
+                        ui.label(format!("📐 Resolution: {}x{} pixels",
+                            (800.0 * self.viewer_2d.scale) as i32,
+                            (600.0 * self.viewer_2d.scale) as i32));
+                    }
+                    SimulationType::ThreeD => {
+                        ui.horizontal(|ui| {
+                            ui.label("🔍 View Zoom:");
+                            ui.add(egui::Slider::new(&mut self.viewer_3d.zoom, 0.5..=5.0)
+                                .text("Zoom"));
+                        });
+                    }
+                }
+
+                ui.separator();
+
                 egui::ScrollArea::vertical().show(ui, |ui| {
 
                     match self.sim_type {

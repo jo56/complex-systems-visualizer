@@ -8,7 +8,8 @@
       "Bash(cargo check:*)",
       "Bash(cargo run:*)",
       "Bash(RUST_BACKTRACE=1 cargo run)",
-      "Bash(set RUST_BACKTRACE=1)"
+      "Bash(set RUST_BACKTRACE=1)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
