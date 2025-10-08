@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-## 🚀 Running the Application
+## Running the Application
 
 ```bash
 # Build and run in release mode (recommended for best performance)
@@ -12,14 +12,14 @@ cargo run
 
 The application will open with a control panel on the left and visualization area on the right.
 
-## 🎯 First Steps
+## First Steps
 
-1. **Choose View Mode**: Click **📊 2D** or **🎲 3D** at the top of the control panel
+1. **Choose View Mode**: Click **2D** or **3D** at the top of the control panel
 2. **Select a Simulation**: Use the dropdown menu to choose which simulation to explore
 3. **Adjust Parameters**: Use sliders and controls to modify the simulation in real-time
 4. **Explore Presets**: Click preset buttons to jump to interesting configurations
 
-## 🌟 Recommended Starting Points
+## Recommended Starting Points
 
 ### Mandelbrot Set (2D Fractal)
 **What it is**: The iconic fractal showing infinite self-similar complexity
@@ -166,7 +166,7 @@ All fractals support 26 color schemes:
 
 **Tip**: Enable **Smooth Coloring** for continuous gradients!
 
-## ⌨️ Controls Summary
+## Controls Summary
 
 ### 2D Fractals
 - **Mousewheel**: Zoom in/out
@@ -186,7 +186,7 @@ All fractals support 26 color schemes:
 - **Collapsible Sections**: Organize parameters
 - **Reset Buttons**: Return to defaults
 
-## ⚡ Performance Tips
+## Performance Tips
 
 1. **Always use `cargo run --release`** for 10x better performance
 2. **High zoom fractals**: Increase Max Iterations (500-1000)
@@ -194,7 +194,7 @@ All fractals support 26 color schemes:
 4. **Smooth 60 FPS**: Release mode + reasonable parameters
 5. **Parallel rendering**: Automatic on all 2D simulations
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Build errors**: Ensure Rust 1.70+ is installed
 ```bash
@@ -207,7 +207,7 @@ rustc --version
 
 **Sliders unresponsive**: Try clicking directly on values to type numbers
 
-## 🎓 Learning Path
+## Learning Path
 
 ### Beginner (Start Here)
 1. Mandelbrot Set - Explore with mousewheel zoom
@@ -227,7 +227,7 @@ rustc --version
 11. Fluid SPH - Particle fluid dynamics
 12. Strange Attractors - Mathematical art
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Fractals**: Zoom slowly for smooth transitions, increase iterations at high zoom
 2. **Game of Life**: Try different rules with same patterns for variety
@@ -235,7 +235,7 @@ rustc --version
 4. **Color cycling**: Animate stationary fractals for dynamic effects
 5. **Combination**: Switch between 2D and 3D frequently for variety
 
-## 🚀 Next Steps
+## Next Steps
 
 - Experiment with **all 39 simulations**
 - Try every preset and color scheme
