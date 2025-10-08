@@ -5,7 +5,7 @@ A comprehensive Rust application for exploring complex systems, fractals, cellul
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## 🌟 Features
+## Features
 
 **39 Unique Simulations** across 2D and 3D categories:
 
@@ -32,7 +32,7 @@ A comprehensive Rust application for exploring complex systems, fractals, cellul
 - **High Performance**: Parallel computation using Rayon for fast rendering
 - **Professional UI**: Organized collapsible sections with emoji icons
 
-## 🏗️ Architecture
+## Architecture
 
 The project uses a Cargo workspace structure for modularity:
 
@@ -93,7 +93,7 @@ mandlebrot-visualizer/
 └── Cargo.toml         # Workspace configuration
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -114,11 +114,11 @@ cargo run --release
 cargo run
 ```
 
-## 🎮 Usage
+## Usage
 
 ### Basic Controls
 
-1. **Select View Mode**: Choose between 📊 2D and 🎲 3D simulations
+1. **Select View Mode**: Choose between 2D and 3D simulations
 2. **Choose Simulation**: Use the dropdown menu to select which simulation to run
 3. **Adjust Parameters**: Use sliders and controls in the side panel
 4. **Explore Presets**: Click preset buttons for interesting configurations
@@ -137,7 +137,7 @@ cargo run
 - **Mousewheel**: Quick zoom adjustment when hovering over 3D view
 - **Auto-Rotate**: Enable automatic rotation for continuous viewing
 
-## 💻 Technology Stack
+## Technology Stack
 
 - **[Rust](https://www.rust-lang.org/)** - Systems programming language
 - **[egui](https://github.com/emilk/egui)** - Immediate mode GUI library
@@ -146,7 +146,7 @@ cargo run
 - **[num-complex](https://github.com/rust-num/num-complex)** - Complex number arithmetic
 - **[noise](https://github.com/Razaekel/noise-rs)** - Perlin noise generation
 
-## ⚡ Performance
+## Performance
 
 - **Parallel Rendering**: All 2D simulations use Rayon for multi-core computation
 - **Optimized Release Builds**: Up to 10x faster than debug builds
@@ -154,12 +154,12 @@ cargo run
 - **High Resolution**: Support for 800x600+ pixel rendering
 - **Efficient 3D**: Custom software rendering with depth sorting
 
-## 📚 Documentation
+## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for new users
 - **[FEATURES.md](FEATURES.md)** - Detailed feature documentation and tips
 
-## 🎨 Highlights
+## Highlights
 
 ### Advanced Fractal Features
 - 26 color schemes with smooth coloring
@@ -187,20 +187,11 @@ cargo run
 - Phyllotaxis patterns
 - Koch snowflake fractals
 
-## 🤝 Contributing
-
-Contributions are welcome! The modular architecture makes it easy to add new simulations:
-
-1. Implement the `Simulation2D` or `Simulation3D` trait
-2. Add your simulation to the appropriate vector in `main.rs`
-3. Follow the existing pattern for UI parameters
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with the excellent Rust ecosystem
 - Thanks to the egui community for the amazing GUI framework
-- Inspired by the beauty of mathematics and emergent complexity
