@@ -7,7 +7,7 @@ license.workspace = true
 description = "An interactive Mandelbrot-style visualizer built with egui"
 
 [[bin]]
-name = "mandelbrot-viz"
+name = "complex-systems-viz"
 path = "src/main.rs"
 
 [dependencies]
