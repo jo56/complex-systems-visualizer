@@ -421,6 +421,11 @@ pub trait Simulation2D: Send + Sync {
     fn get_zoom(&self) -> f64 {
         1.0
     }
+
+    /// Adjust zoom level (for mousewheel zoom)
+    fn adjust_zoom(&mut self, _delta: f64) {
+        // Default: do nothing
+    }
 }
 
 /// Trait for 3D simulations

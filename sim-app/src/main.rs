@@ -152,6 +152,8 @@ impl eframe::App for ComplexSystemsApp {
                             ui.label("🔍 Pattern Detail:");
                             if ui.add(egui::Slider::new(&mut self.viewer_2d.scale, 0.25..=2.0)
                                 .text("Scale")).changed() {
+                                // Clamp value to ensure it stays within valid range
+                                self.viewer_2d.scale = self.viewer_2d.scale.clamp(0.25, 2.0);
                                 self.viewer_2d.needs_update = true;
                                 // Reset pan when scale changes to prevent shift
                                 self.viewer_2d.pan_x = 0.0;
@@ -171,14 +173,18 @@ impl eframe::App for ComplexSystemsApp {
                         ui.label(format!("📐 Resolution: {}x{} pixels",
                             (800.0 * self.viewer_2d.scale) as i32,
                             (600.0 * self.viewer_2d.scale) as i32));
-                        ui.label("💡 Tip: Drag to pan when zoomed");
+                        ui.label("💡 Tip: Drag to pan (fractals), mousewheel to zoom (fractals)");
                     }
                     SimulationType::ThreeD => {
                         ui.horizontal(|ui| {
                             ui.label("🔍 View Zoom:");
-                            ui.add(egui::Slider::new(&mut self.viewer_3d.zoom, 0.5..=5.0)
-                                .text("Zoom"));
+                            if ui.add(egui::Slider::new(&mut self.viewer_3d.zoom, 0.5..=5.0)
+                                .text("Zoom")).changed() {
+                                // Clamp value to ensure it stays within valid range
+                                self.viewer_3d.zoom = self.viewer_3d.zoom.clamp(0.5, 5.0);
+                            }
                         });
+                        ui.label("💡 Tip: Mousewheel to zoom");
                     }
                 }
 

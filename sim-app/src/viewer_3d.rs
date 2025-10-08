@@ -128,17 +128,23 @@ impl Viewer3D {
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.label("Rotation X:");
-                    ui.add(egui::Slider::new(&mut self.rotation_x, 0.0..=std::f32::consts::TAU));
+                    if ui.add(egui::Slider::new(&mut self.rotation_x, 0.0..=std::f32::consts::TAU)).changed() {
+                        self.rotation_x = self.rotation_x.clamp(0.0, std::f32::consts::TAU);
+                    }
                 });
 
                 ui.horizontal(|ui| {
                     ui.label("Rotation Y:");
-                    ui.add(egui::Slider::new(&mut self.rotation_y, 0.0..=std::f32::consts::TAU));
+                    if ui.add(egui::Slider::new(&mut self.rotation_y, 0.0..=std::f32::consts::TAU)).changed() {
+                        self.rotation_y = self.rotation_y.clamp(0.0, std::f32::consts::TAU);
+                    }
                 });
 
                 ui.horizontal(|ui| {
                     ui.label("Point Size:");
-                    ui.add(egui::Slider::new(&mut self.point_size, 1.0..=15.0));
+                    if ui.add(egui::Slider::new(&mut self.point_size, 1.0..=15.0)).changed() {
+                        self.point_size = self.point_size.clamp(1.0, 15.0);
+                    }
                 });
 
                 ui.checkbox(&mut self.auto_rotate, "Auto-Rotate");
@@ -360,10 +366,32 @@ impl Viewer3D {
             ));
         }
 
-        // Display texture
+        // Display texture with interactive controls
         if let Some(texture) = &self.texture {
             let size = egui::vec2(width as f32, height as f32);
-            ui.image((texture.id(), size));
+            let response = ui.allocate_rect(
+                egui::Rect::from_min_size(ui.cursor().min, size),
+                egui::Sense::hover(),
+            );
+
+            // Handle mousewheel for zoom control
+            if response.hovered() {
+                ui.input(|i| {
+                    let scroll_delta = i.smooth_scroll_delta.y;
+                    if scroll_delta.abs() > 0.1 {
+                        // Adjust zoom based on scroll direction
+                        let zoom_factor = 1.0 + scroll_delta * 0.001;
+                        self.zoom = (self.zoom * zoom_factor).clamp(0.5, 5.0);
+                    }
+                });
+            }
+
+            ui.painter().image(
+                texture.id(),
+                response.rect,
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
         }
     }
 }

@@ -248,6 +248,12 @@ impl Simulation2D for Mandelbrot {
         self.center_y -= dy * view_height / height as f64;
     }
 
+    fn adjust_zoom(&mut self, delta: f64) {
+        // Adjust zoom with exponential scaling for smooth mousewheel control
+        let zoom_factor = 1.0 + delta * 0.001;
+        self.zoom = (self.zoom * zoom_factor).clamp(0.1, 10000.0);
+    }
+
     fn get_zoom(&self) -> f64 {
         self.zoom
     }

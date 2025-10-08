@@ -80,6 +80,18 @@ impl Viewer2D {
                 self.needs_update = true;
             }
 
+            // Handle mousewheel for zoom control
+            if simulation.supports_zoom() {
+                ui.input(|i| {
+                    let scroll_delta = i.smooth_scroll_delta.y;
+                    if scroll_delta.abs() > 0.1 {
+                        // Adjust the simulation's zoom parameter
+                        simulation.adjust_zoom(scroll_delta as f64);
+                        self.needs_update = true;
+                    }
+                });
+            }
+
             // Draw the image
             let rect = response.rect;
             ui.painter().image(
