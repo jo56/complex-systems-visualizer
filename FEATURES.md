@@ -1,10 +1,10 @@
 # Complete Features Guide
 
-## 📊 Overview
+## Overview
 
 **Complex Systems Visualizer** includes **39 unique simulations** organized into 2D and 3D categories, each with extensive customization options and interactive controls.
 
-## 🎮 Core Features
+## Core Features
 
 ### Interactive Controls
 - **Real-time Parameter Adjustment**: All sliders update visualization immediately
@@ -22,7 +22,7 @@
 - **Trail Visualization**: Motion trails for particles and attractors
 - **Age-Based Coloring**: Visualize temporal data
 
-## 🎨 Color Scheme System
+## Color Scheme System
 
 All fractal simulations support **26 professional color schemes**:
 
@@ -542,7 +542,7 @@ All attractors share common features:
 - Growth animation
 - Speed control
 
-## 🎯 Advanced Features
+## Advanced Features
 
 ### Fractal Zoom & Navigation
 - **Mousewheel Zoom**: Smooth, exponential zooming
@@ -574,7 +574,7 @@ All attractors share common features:
 - **Tooltips**: Hover information (where applicable)
 - **Value Input**: Click sliders to type exact values
 
-## 🚀 Performance Notes
+## Performance Notes
 
 ### 2D Simulations
 - All fractals use parallel computation (Rayon)
@@ -595,7 +595,7 @@ All attractors share common features:
 4. Shorter trails for faster 3D rendering
 5. Disable auto-rotate when adjusting parameters
 
-## 🎓 Technical Details
+## Technical Details
 
 ### Fractal Algorithms
 - **Escape-time algorithm** for Mandelbrot/Julia/Burning Ship
@@ -620,7 +620,7 @@ All attractors share common features:
 - **Bitwise operations** for efficiency
 - **Wraparound boundaries** (toroidal topology)
 
-## 💡 Usage Tips
+## Usage Tips
 
 ### Fractals
 1. Start at low zoom, increase iterations as you zoom
@@ -647,8 +647,6 @@ All attractors share common features:
 3. Balance visual appeal vs. performance
 4. Enable auto-rotate for full 3D appreciation
 
-## 🌌 Enjoy Exploring!
+## Enjoy Exploring!
 
 With 39 unique simulations and thousands of parameter combinations, there's always something new to discover. The beauty of complex systems lies in how simple rules create infinite variety.
-
-**Happy exploring!** 🚀
