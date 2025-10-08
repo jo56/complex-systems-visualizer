@@ -7,7 +7,7 @@ license.workspace = true
 description = "An interactive Mandelbrot-style visualizer built with egui"
 
 [[bin]]
-name = "complex-systems-viz"
+name = "complex-systems-visualizer"
 path = "src/main.rs"
 
 [dependencies]
@@ -20,12 +20,12 @@ num-complex.workspace = true
 
 # --- macOS bundle metadata for cargo-bundle ---
 [package.metadata.bundle]
-name = "complex-systems-viz"
+name = "complex-systems-visualizer"
 identifier = "com.yourname.mandelbrotviz"
 version = "0.1.0"
 short_description = "Explore Mandelbrot and fractal-style visualizations"
 long_description = """
-complex-systems-viz is a desktop application for exploring Mandelbrot-style
+complex-systems-visualizer is a desktop application for exploring Mandelbrot-style
 fractals and interactive visualizations built with egui.
 """
 # workflow will generate this .icns file from AppIcon.png at build time
