@@ -155,7 +155,7 @@ The application will open with a control panel on the left and visualization are
 3. Change **Rotation Speed** to see galaxy spin
 4. Higher **Disk Thickness** for more 3D structure
 
-## 🎨 Color Schemes
+## Color Schemes
 
 All fractals support 26 color schemes:
 - **Classic, Rainbow, Fire, Ice** - Traditional palettes
