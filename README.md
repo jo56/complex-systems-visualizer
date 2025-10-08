@@ -146,14 +146,6 @@ cargo run
 - **[num-complex](https://github.com/rust-num/num-complex)** - Complex number arithmetic
 - **[noise](https://github.com/Razaekel/noise-rs)** - Perlin noise generation
 
-## Performance
-
-- **Parallel Rendering**: All 2D simulations use Rayon for multi-core computation
-- **Optimized Release Builds**: Up to 10x faster than debug builds
-- **Real-time Updates**: Smooth 60 FPS animations
-- **High Resolution**: Support for 800x600+ pixel rendering
-- **Efficient 3D**: Custom software rendering with depth sorting
-
 ## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide for new users
