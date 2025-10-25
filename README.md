@@ -5,6 +5,11 @@ A comprehensive Rust application for exploring complex systems, fractals, cellul
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+## Preview
+
+![Complex Systems Visualizer at Burning Ship landmark](assets/complex-systems-visualizer-preview.png)
+
+
 ## Features
 
 **39 Unique Simulations** across 2D and 3D categories:
