@@ -9,7 +9,7 @@ A comprehensive Rust application for exploring complex systems, fractals, cellul
 
 ![Complex Systems Visualizer at Burning Ship landmark](assets/complex-systems-visualizer-preview.png)
 
-*Burning Ship fractal at 'Antenna Detail' landmark*
+*Burning Ship fractal at "Antenna Detail" landmark*
 
 ## Features
 
