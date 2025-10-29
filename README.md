@@ -1,18 +1,17 @@
 # Complex Systems Visualizer
 
-A comprehensive Rust application for exploring complex systems, fractals, cellular automata, particle simulations, and emergent behavior through interactive visualizations. Built with [egui](https://github.com/emilk/egui) for the GUI.
-
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
-## Preview
-
 <div align="center">
           <img src="assets/complex-systems-visualizer-preview.png" alt="burning ship preview">
       <br>
           <i>Burning Ship fractal at an interesting landmark</i>
     <br>
   </div>
+<br>
+
+A comprehensive Rust application for exploring complex systems, fractals, cellular automata, particle simulations, and emergent behavior through interactive visualizations.
+
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## Features
 
