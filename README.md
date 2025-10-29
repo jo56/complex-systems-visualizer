@@ -7,9 +7,12 @@ A comprehensive Rust application for exploring complex systems, fractals, cellul
 
 ## Preview
 
-![Complex Systems Visualizer at Burning Ship landmark](assets/complex-systems-visualizer-preview.png)
-
-*Burning Ship fractal at an interesting landmark*
+<div align="center">
+          <img src="assets/complex-systems-visualizer-preview.png" alt="burning ship preview">
+      <br>
+          <i>Burning Ship fractal at an interesting landmark</i>
+    <br>
+  </div>
 
 ## Features
 
