@@ -5,8 +5,12 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 
+[features]
+default = ["parallel"]
+parallel = ["rayon"]
+
 [dependencies]
-rayon.workspace = true
+rayon = { workspace = true, optional = true }
 num-complex.workspace = true
 egui = "0.29"
 noise.workspace = true
