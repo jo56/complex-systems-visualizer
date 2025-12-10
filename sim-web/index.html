@@ -53,17 +53,5 @@
         <div>Loading Complex Systems Visualizer...</div>
     </div>
     <canvas id="canvas"></canvas>
-    <script>
-        // Hide loading indicator when WASM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // The loading indicator will be hidden by the WASM app when it starts
-            setTimeout(function() {
-                var loading = document.getElementById('loading');
-                if (loading) {
-                    loading.style.display = 'none';
-                }
-            }, 100);
-        });
-    </script>
 </body>
 </html>

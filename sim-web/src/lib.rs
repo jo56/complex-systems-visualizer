@@ -1,38 +1,44 @@
 //! WebAssembly entry point for the Complex Systems Visualizer
 
-use wasm_bindgen::prelude::*;
+use log::LevelFilter;
+use wasm_bindgen::{prelude::*, JsCast};
 
 /// Entry point for WASM - called from JavaScript
 #[wasm_bindgen(start)]
 pub async fn start() -> Result<(), JsValue> {
-    // Initialize panic hook for better error messages in browser console
+    // Initialize better diagnostics for the browser console
     console_error_panic_hook::set_once();
+    eframe::WebLogger::init(LevelFilter::Info).ok();
 
-    // Get the canvas element from the DOM
-    let document = web_sys::window()
-        .expect("No window")
+    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window"))?;
+    let document = window
         .document()
-        .expect("No document");
+        .ok_or_else(|| JsValue::from_str("No document"))?;
 
     let canvas = document
         .get_element_by_id("canvas")
-        .expect("No canvas element with id 'canvas'")
+        .ok_or_else(|| JsValue::from_str("No canvas element with id 'canvas'"))?
         .dyn_into::<web_sys::HtmlCanvasElement>()
-        .expect("Element is not a canvas");
+        .map_err(|_| JsValue::from_str("Element is not a canvas"))?;
 
-    // Start the eframe web app
+    // Loading overlay is hidden once the app is created
+    let loading = document
+        .get_element_by_id("loading")
+        .and_then(|el| el.dyn_into::<web_sys::HtmlElement>().ok());
+
     let web_options = eframe::WebOptions::default();
 
-    wasm_bindgen_futures::spawn_local(async move {
-        eframe::WebRunner::new()
-            .start(
-                canvas,
-                web_options,
-                Box::new(|cc| Ok(Box::new(sim_app::ComplexSystemsApp::new(cc)))),
-            )
-            .await
-            .expect("Failed to start eframe");
-    });
-
-    Ok(())
+    eframe::WebRunner::new()
+        .start(
+            canvas,
+            web_options,
+            Box::new(move |cc| {
+                if let Some(loading) = loading {
+                    let _ = loading.style().set_property("display", "none");
+                }
+                Ok(Box::new(sim_app::ComplexSystemsApp::new(cc)))
+            }),
+        )
+        .await
+        .map_err(|err| JsValue::from_str(&err.to_string()))
 }
