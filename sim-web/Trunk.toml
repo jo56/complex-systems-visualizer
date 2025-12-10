@@ -2,6 +2,9 @@
 target = "index.html"
 dist = "dist"
 
+[[copy]]
+source = "_headers"
+
 [watch]
 watch = ["src", "index.html"]
 
@@ -9,3 +12,4 @@ watch = ["src", "index.html"]
 address = "127.0.0.1"
 port = 8080
 open = true
+headers = { "Cross-Origin-Opener-Policy" = "same-origin", "Cross-Origin-Embedder-Policy" = "require-corp" }

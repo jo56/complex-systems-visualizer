@@ -17,7 +17,7 @@ path = "src/main.rs"
 [features]
 default = ["native"]
 native = ["eframe/default", "sim-core/parallel"]
-web = ["eframe/glow"]
+web = ["eframe/glow", "sim-core/parallel"]
 
 [dependencies]
 sim-core = { path = "../sim-core", default-features = false }

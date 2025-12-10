@@ -2,6 +2,7 @@
 
 use log::LevelFilter;
 use wasm_bindgen::{prelude::*, JsCast};
+use wasm_bindgen_rayon::init_thread_pool;
 
 /// Entry point for WASM - called from JavaScript
 #[wasm_bindgen(start)]
@@ -11,6 +12,12 @@ pub async fn start() -> Result<(), JsValue> {
     eframe::WebLogger::init(LevelFilter::Info).ok();
 
     let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window"))?;
+
+    // Start Rayon thread pool for WASM if possible
+    let threads = window.navigator().hardware_concurrency() as usize;
+    let threads = if threads > 0 { threads } else { 4 };
+    wasm_bindgen_futures::JsFuture::from(init_thread_pool(threads)).await?;
+
     let document = window
         .document()
         .ok_or_else(|| JsValue::from_str("No document"))?;
@@ -40,4 +47,5 @@ pub async fn start() -> Result<(), JsValue> {
             }),
         )
         .await
+        .map_err(|err| JsValue::from_str(&format!("{:?}", err)))
 }
