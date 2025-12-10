@@ -1,12 +1,15 @@
 # Complex Systems Visualizer
 
 <div align="center">
+          <a href="https://complex-systems-visualizer.pages.dev/" target="_blank">
           <img src="assets/complex-systems-visualizer-preview.png" alt="burning ship preview">
+          </a>
       <br>
           <i>Burning Ship fractal at an interesting landmark</i>
     <br>
   </div>
 <br>
+
 
 A comprehensive Rust application for exploring complex systems, fractals, cellular automata, particle simulations, and emergent behavior through interactive visualizations.
 
