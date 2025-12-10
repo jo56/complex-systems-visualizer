@@ -29,6 +29,8 @@ num-complex.workspace = true
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # Only include rayon for native builds
 rayon.workspace = true
+# Image loading for window icon
+image = { version = "0.25", default-features = false, features = ["png"] }
 
 # --- macOS bundle metadata for cargo-bundle ---
 [package.metadata.bundle]

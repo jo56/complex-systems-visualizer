@@ -2769,6 +2769,7 @@ dependencies = [
  "eframe",
  "egui",
  "egui_plot",
+ "image",
  "num-complex",
  "rayon",
  "sim-core",
