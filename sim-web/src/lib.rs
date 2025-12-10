@@ -40,5 +40,4 @@ pub async fn start() -> Result<(), JsValue> {
             }),
         )
         .await
-        .map_err(|err| JsValue::from_str(&err.to_string()))
 }
