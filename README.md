@@ -98,6 +98,17 @@ mandlebrot-visualizer/
 │   │   └── viewer_3d.rs        # 3D visualization renderer
 │   └── Cargo.toml
 │
+├── sim-web/           # WebAssembly build for browsers
+│   ├── src/
+│   │   └── lib.rs              # WASM entry point
+│   ├── index.html              # Web template
+│   ├── Trunk.toml              # Trunk bundler config
+│   └── Cargo.toml
+│
+├── scripts/           # Build automation
+│   ├── build-web.sh            # Unix/macOS web build script
+│   └── build-web.ps1           # Windows web build script
+│
 └── Cargo.toml         # Workspace configuration
 ```
 
@@ -120,6 +131,75 @@ cargo run --release
 
 # Or for development (faster compilation, slower runtime)
 cargo run
+```
+
+### Web Build (WASM)
+
+Run the application in your browser using WebAssembly:
+
+#### Prerequisites
+
+Install [Trunk](https://trunkrs.dev/), the WASM bundler:
+
+```bash
+cargo install trunk
+```
+
+Add the WebAssembly target:
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
+
+#### Option 1: Using Build Scripts
+
+```bash
+# Unix/macOS/Linux
+./scripts/build-web.sh
+
+# Windows (PowerShell)
+.\scripts\build-web.ps1
+```
+
+The compiled files will be in `sim-web/dist/`.
+
+#### Option 2: Using Trunk Directly
+
+```bash
+cd sim-web
+
+# Development server with hot reload
+trunk serve
+
+# Production build
+trunk build --release
+```
+
+#### Option 3: Development Server
+
+For local development with live reload:
+
+```bash
+cd sim-web
+trunk serve --open
+```
+
+This starts a local server at `http://127.0.0.1:8080` and opens it in your browser.
+
+#### Serving the Built Files
+
+After building, serve the `sim-web/dist/` directory with any static file server:
+
+```bash
+# Using Python
+cd sim-web/dist && python -m http.server 8080
+
+# Using Node.js (npx)
+npx serve sim-web/dist
+
+# Using Rust's simple-http-server
+cargo install simple-http-server
+simple-http-server sim-web/dist
 ```
 
 ## Usage
@@ -149,10 +229,12 @@ cargo run
 
 - **[Rust](https://www.rust-lang.org/)** - Systems programming language
 - **[egui](https://github.com/emilk/egui)** - Immediate mode GUI library
-- **[eframe](https://github.com/emilk/egui/tree/master/crates/eframe)** - Application framework
+- **[eframe](https://github.com/emilk/egui/tree/master/crates/eframe)** - Application framework (native + web)
 - **[rayon](https://github.com/rayon-rs/rayon)** - Data parallelism for performance
 - **[num-complex](https://github.com/rust-num/num-complex)** - Complex number arithmetic
 - **[noise](https://github.com/Razaekel/noise-rs)** - Perlin noise generation
+- **[wasm-bindgen](https://github.com/rustwasm/wasm-bindgen)** - Rust/JavaScript interop for WebAssembly
+- **[Trunk](https://trunkrs.dev/)** - WASM web application bundler
 
 ## Documentation
 

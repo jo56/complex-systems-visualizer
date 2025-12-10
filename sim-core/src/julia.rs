@@ -1,5 +1,7 @@
 use crate::{Color, ColorScheme, Simulation2D};
 use num_complex::Complex64;
+
+#[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
 pub struct Julia {
@@ -104,18 +106,21 @@ impl Simulation2D for Julia {
     }
 
     fn compute(&self, width: usize, height: usize) -> Vec<Color> {
-        (0..height)
-            .into_par_iter()
-            .flat_map(|y| {
-                (0..width)
-                    .map(|x| {
-                        let z = self.pixel_to_complex(x, y, width, height);
-                        let (iterations, smooth_iter) = self.julia_iterations(z);
-                        self.iterations_to_color(iterations, smooth_iter)
-                    })
-                    .collect::<Vec<_>>()
-            })
-            .collect()
+        #[cfg(feature = "parallel")]
+        let iter = (0..height).into_par_iter();
+        #[cfg(not(feature = "parallel"))]
+        let iter = (0..height).into_iter();
+
+        iter.flat_map(|y| {
+            (0..width)
+                .map(|x| {
+                    let z = self.pixel_to_complex(x, y, width, height);
+                    let (iterations, smooth_iter) = self.julia_iterations(z);
+                    self.iterations_to_color(iterations, smooth_iter)
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect()
     }
 
     fn ui_parameters(&mut self, ui: &mut egui::Ui) -> bool {

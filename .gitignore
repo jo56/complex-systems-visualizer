@@ -1,8 +1,7 @@
-# Rust
+# Rust build artifacts
 /target/
 **/*.rs.bk
 *.pdb
-Cargo.lock
 
 # IDE
 .vscode/
@@ -15,7 +14,7 @@ Cargo.lock
 .DS_Store
 Thumbs.db
 
-# Build artifacts
+# Build artifacts (binaries created outside target/)
 *.exe
 *.dll
 *.so
@@ -24,4 +23,12 @@ Thumbs.db
 # Debug
 debug/
 
+# WASM build artifacts
+sim-web/dist/
+*.wasm
+
+# Trunk cache
+.trunk/
+
+# Claude Code
 .claude/
