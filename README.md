@@ -13,6 +13,7 @@
 
 A comprehensive Rust application for exploring complex systems, fractals, cellular automata, particle simulations, and emergent behavior through interactive visualizations.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-complex--systems--visualizer.pages.dev-blue?style=flat&logo=cloudflarepages)](https://complex-systems-visualizer.pages.dev/)
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
