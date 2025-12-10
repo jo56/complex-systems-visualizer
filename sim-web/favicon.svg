@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Minimalist Mandelbrot Set Silhouette -->
+  <!-- Iconic cardioid + bulb shape, white on transparent -->
+
+  <g transform="translate(50, 50) scale(0.85)">
+    <!-- Main cardioid (heart-shaped body) -->
+    <path fill="#FFFFFF" d="
+      M 20 0
+      C 20 -22 5 -35 -12 -35
+      C -29 -35 -42 -22 -42 0
+      C -42 22 -29 35 -12 35
+      C 5 35 20 22 20 0
+      Z
+    "/>
+
+    <!-- Primary circular bulb (left) -->
+    <circle fill="#FFFFFF" cx="-42" cy="0" r="12"/>
+
+    <!-- Small antenna bulbs for iconic look -->
+    <circle fill="#FFFFFF" cx="-52" cy="-8" r="4"/>
+    <circle fill="#FFFFFF" cx="-52" cy="8" r="4"/>
+    <circle fill="#FFFFFF" cx="-55" cy="0" r="3"/>
+  </g>
+</svg>
