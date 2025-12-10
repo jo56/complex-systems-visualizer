@@ -18,7 +18,7 @@ jobs:
       - name: Generate .ico from PNG
         run: |
           if (Test-Path "sim-app/assets/AppIcon.png") {
-            magick "sim-app/assets/AppIcon.png" "sim-app/assets/AppIcon.ico"
+            magick "sim-app/assets/AppIcon.png" -define icon:auto-resize=256,128,64,48,32,16 "sim-app/assets/AppIcon.ico"
           } else {
             Write-Host "No AppIcon.png found, skipping Windows icon generation"
           }
