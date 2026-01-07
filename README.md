@@ -206,6 +206,8 @@ cargo install simple-http-server
 simple-http-server sim-web/dist
 ```
 
+<i>Some fractals may not perform well in web due to CPU-intensive WASM limitations. Check out <a href="https://github.com/jo56/fractal-madness">Fractal Madness</a> for a WebGPU-based alternative.</i>
+
 ## Usage
 
 ### Basic Controls
