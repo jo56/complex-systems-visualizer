@@ -12,12 +12,12 @@
 
 A comprehensive Rust application for exploring complex systems, fractals, cellular automata, particle simulations, and emergent behavior through interactive visualizations.
 
+<i>Note: Some fractals may not perform well in web due to CPU-intensive WASM limitations. Check out <a href="https://github.com/jo56/fractal-madness">Fractal Madness</a> for a WebGPU-based alternative.</i>
+
+
 [![Try Online](https://img.shields.io/badge/Try%20Online-blue?style=flat&logo=cloudflarepages&logoColor=white)](https://complex-systems-visualizer.pages.dev/)
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
-<i>Note: Some fractals may not perform well in web due to CPU-intensive WASM limitations. Check out <a href="https://github.com/jo56/fractal-madness">Fractal Madness</a> for a WebGPU-based alternative.</i>
-
 
 ## Features
 
