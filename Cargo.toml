@@ -13,7 +13,7 @@ rayon = "1.10"
 image = "0.25"
 num-complex = "0.4"
 noise = "0.9"
-rand = "0.8"
+rand = "0.9"
 palette = "0.7"
 
 # Optimize WASM builds for size
